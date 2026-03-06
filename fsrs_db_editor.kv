@@ -1,0 +1,159 @@
+#:kivy 2.3.1
+
+MDScreen:
+    md_bg_color: 1,1,1,1
+    MDBoxLayout:
+        orientation: "vertical"
+        MDBoxLayout:
+            size_hint_y: None
+            height: "48dp"
+            padding: "6dp"
+            spacing: "8dp"
+            MDLabel:
+                text: "DB Editor"
+                halign: "left"
+            MDBoxLayout:
+                size_hint_x: None
+                width: "220dp"
+                spacing: "8dp"
+                MDButton:
+                    style: "elevated"
+                    text: "Open DB"
+                    on_release: app.open_file_picker()
+                MDButton:
+                    text: "Refresh"
+                    style: "elevated"
+                    on_release: app.load_topics()
+
+        # Header row (table-like)
+        GridLayout:
+            cols: 7
+            size_hint_y: None
+            height: '36dp'
+            row_default_height: '36dp'
+            spacing: '4dp'
+            canvas.before:
+                Color:
+                    rgba: .95, .95, .95, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            MDLabel:
+                text: "ID"
+                size_hint_x: 0.08
+                halign: 'left'
+            MDLabel:
+                text: "MainCategory"
+                size_hint_x: 0.12
+                halign: 'left'
+            MDLabel:
+                text: "SubCategory"
+                size_hint_x: 0.12
+                halign: 'left'
+            MDLabel:
+                text: "TopicDetail"
+                size_hint_x: 0.45
+                halign: 'left'
+            MDLabel:
+                text: "Grade"
+                size_hint_x: 0.06
+                halign: 'left'
+            # MDLabel:
+            #     text: "Difficulty"
+            #     size_hint_x: 0.09
+            #     halign: 'left'
+            # MDLabel:
+            #     text: "Stability"
+            #     size_hint_x: 0.09
+            #     halign: 'left'
+            MDLabel:
+                text: "Reviewed"
+                size_hint_x: 0.09
+                halign: 'left'    
+            MDLabel:
+                text: "To Review"
+                size_hint_x: 0.09
+                halign: 'left'
+
+        RecycleView:
+            id: rv
+            viewclass: 'TopicRow'
+            RecycleBoxLayout:
+                default_size: None, dp(40)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+
+        BoxLayout:
+            size_hint_y: None
+            height: "56dp"
+            padding: "8dp"
+            Button:
+                text: "Refresh"
+                on_release: app.load_topics()
+
+
+<TopicRow>:
+    canvas.before:
+        Color:
+            rgba: root.bgcolor if hasattr(root, 'bgcolor') else (1,1,1,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    MDLabel:
+        text: root.col0
+        size_hint_x: 0.08
+        halign: 'left'
+        shorten: True
+        shorten_from: 'right'
+        font_size: '14sp'
+        text_size: self.size
+    MDLabel:
+        text: root.col1
+        size_hint_x: 0.12
+        halign: 'left'
+        shorten: True
+        shorten_from: 'right'
+        font_size: '14sp'
+        text_size: self.size
+    MDLabel:
+        text: root.col2
+        size_hint_x: 0.12
+        halign: 'left'
+        shorten: True
+        shorten_from: 'right'
+        font_size: '14sp'
+        text_size: self.size
+    MDLabel:
+        text: root.col3
+        size_hint_x: 0.45
+        halign: 'left'
+        shorten: True
+        shorten_from: 'right'
+        font_size: '14sp'
+        text_size: self.size
+    MDLabel:
+        text: root.col4
+        size_hint_x: 0.06
+        halign: 'left'
+        shorten: True
+        shorten_from: 'right'
+        font_size: '14sp'
+        text_size: self.size
+    MDLabel:
+        text: root.col5
+        size_hint_x: 0.09
+        halign: 'left'
+        shorten: True
+        shorten_from: 'right'
+        font_size: '14sp'
+        text_size: self.size
+    MDLabel:
+        text: root.col6
+        size_hint_x: 0.09
+        halign: 'left'
+        shorten: True
+        shorten_from: 'right'
+        font_size: '14sp'
+        text_size: self.size
