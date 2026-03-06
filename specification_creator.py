@@ -117,4 +117,4 @@ def sub_list_gen(website: str, name: str, api_key_param:str):
 """ if len(errors) > 0:
     counter = 0
     for counter in range (0, len(errors)):
-        print(errors[counter]) """
+"""

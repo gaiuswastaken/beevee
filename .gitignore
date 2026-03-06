@@ -8,25 +8,20 @@ venv/
 # Ignore redundant folders
 spare/
 
+Ignore database and SQL files
+*.db
+*.sql
+
 # Ignore redundant files
 .open
 asset.kv
 Background.py
-comp_sci_for_me.db
-comp_sci_for_me.sql
-comp_sci.db
-comp_sci.sql
 db_helper_resolve.py
 emoji.ttf
 figtree.ttf
 fixing sql extractor.py
 font.ttf
 fredoka-one.zip
-Further Maths.db
-Further Maths.sql
-further_maths.sql
-further_maths_for_me.db
-further_maths_for_me.sql
 kivy layout test.py
 kivy text fields test.py
 Kivy_Asset_place.py
@@ -36,9 +31,6 @@ maths_for_me.sql
 Money
 Noto_Color_Emoji.zip
 OFL.txt
-physics_for_me.db
-physics_for_me.sql
-physics.sql
 rubik.ttf
 tempCodeRunnerFile.python
 text_fields_test.kv
