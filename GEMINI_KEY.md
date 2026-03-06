@@ -4,6 +4,8 @@
 2. Click on the blue button that says "Create or view a Gemini API Key"
 3. Sign in to Google (if you already have not)
    <img width="535" height="674" alt="image" src="https://github.com/user-attachments/assets/47ad1acd-5d3c-4cf5-bc2f-30c801cc0f4e" />
+
+   
    
 4. Then go to projects:
    <img width="267" height="451" alt="image" src="https://github.com/user-attachments/assets/a9c7adce-49f5-40f1-bee4-3041ea5ab4c8" />
