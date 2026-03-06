@@ -1,4 +1,20 @@
-# How to get an API Key
+# What is an API Key?
+
+An API key is a way for a service to determine who you are and whether you have access to this service
+
+It is kind of like a login, only this time, there is no username and password!
+
+# Why would I need a Google Gemini API key?
+
+The program requires access to Google Gemini to create specifications usable by machines. To use Gemini outside of the website (such as using it here), it would need to get an API key to determine who you are.
+
+The main reason why I am not giving you my API key is because of privacy reasons and the fact that the free tier of Google Gemini is only restricted to 20 messages a day.
+
+# Where is my API key being used?
+
+Your API key is only used during the initial setup. IT IS NEVER STORED ON YOUR COMPUTER.
+
+# How to get an API Key?
 
 1. Open this link here: https://ai.google.dev/gemini-api/docs/api-key
 2. Click on the blue button that says "Create or view a Gemini API Key"
