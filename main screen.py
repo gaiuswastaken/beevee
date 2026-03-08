@@ -141,8 +141,6 @@ MDBoxLayout:
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
         
-        # blank screen is created dynamically by app.show_blank(), not in KV
-        
 """
 
 # This defines the class NavItem outside of the KV so that Kivy Understands what it is
