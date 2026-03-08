@@ -21,7 +21,7 @@ MDScreen:
             orientation: "vertical"
             spacing: "24dp"
             padding: "32dp"
-            md_bg_color: 1, 1, 1, 1
+            md_bg_color: self.theme_cls.backgroundColor
 
             MDLabel:
                 text: "Welcome to Beevee!!!"
@@ -46,7 +46,7 @@ MDScreen:
             orientation: "vertical"
             spacing: "16dp"
             padding: "32dp"
-            md_bg_color: 1, 1, 1, 1
+            md_bg_color: self.theme_cls.backgroundColor
             
             MDLabel:
                 text: "Please enter your Google Gemini API Key or get one if you don't (I am not giving you mine 😭)"
@@ -91,7 +91,7 @@ MDScreen:
             orientation: "vertical"
             spacing: "16dp"
             padding: "32dp"
-            md_bg_color: 1, 1, 1, 1
+            md_bg_color: self.theme_cls.backgroundColor
 
             MDLabel:
                 id: subject_title
@@ -142,7 +142,7 @@ MDScreen:
         # Gemini Processing Page
         MDBoxLayout:
             orientation: "vertical"
-            md_bg_color: 1, 1, 1, 1 
+            md_bg_color: self.theme_cls.backgroundColor 
 
             MDLoadingIndicator:
                 id: indicator
@@ -162,7 +162,7 @@ MDScreen:
             orientation: "vertical"
             spacing: "24dp"
             padding: "32dp"
-            md_bg_color: 1, 1, 1, 1
+            md_bg_color: self.theme_cls.backgroundColor
 
             MDLabel:
                 theme_font_name: "Custom"
