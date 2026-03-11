@@ -77,70 +77,103 @@ MDBoxLayout:
         id: screen_manager
         current: ""
         md_bg_color: app.theme_cls.backgroundColor # This way, dark mode is also supported
-
+        
+        # The blank screen that shows up first (when the main program is launched)
         MDScreen:
             name: "blank"
-            BoxLayout:
+            MDBoxLayout:
                 MDLabel:
                     text: "Click on the home icon to see your tasks 😊"
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
-
+        
+        # The editor
         MDScreen:
             name: "editor"
-            BoxLayout:
+            FloatLayout:
+                orientation: "vertical"
+                padding: "16dp"
+                spacing: "8dp"
                 MDLabel:
                     text: "Editor"
                     halign: "center"
+                    pos_hint: {"center_y": 0.9}
                     theme_font_name: "Custom"
+                    font_style: "Display"
+                    role: "small"
                     font_name: "robotvar.ttf"
                 
                 MDLabel:
                     text: "Choose your database to edit and the editor will open here"
                     halign: "center"
+                    pos_hint: {"center_y": 0.8}
                     theme_font_name: "Custom"
+                    font_style: "Headline"
+                    role: "small"
                     font_name: "robotvar.ttf"
-            
+                
+                # Where the databases are listed   
+                MDScrollView:
+                    do_scroll_x: False
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        size_hint_y: 0.5
+                        size_hint_x: 0.5
+                        pos_hint: {"center_x": 0.5,"center_y": 0.5}
+                        #md_bg_color: app.theme_cls.primaryColor
+                        
+                        MDListItem:
+                            MDListItemHeadlineText:
+                                text: "DB1"
+                        MDListItem:
+                            MDListItemHeadlineText:
+                                text: "DB2"
+        
+        # The Shop            
         MDScreen:
             name: "shop"
-            BoxLayout:
+            MDBoxLayout:
                 MDLabel:
                     text: "Shop"
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
         
+        # The homepage - where the tasks are shown
         MDScreen:
             name: "home"
-            BoxLayout:
+            MDBoxLayout:
                 MDLabel:
                     text: "Tasks"
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
         
+        # The inventory
         MDScreen:
             name: "inventory"
-            BoxLayout:
+            MDBoxLayout:
                 MDLabel:
                     text: "Inventory"
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
-                    
+        
+        # The index         
         MDScreen:
             name: "index"
-            BoxLayout:
+            MDBoxLayout:
                 MDLabel:
                     text: "Index"
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
-                    
+        
+        # The settings page (implement last as minor)            
         MDScreen:
             name: "settings"
-            BoxLayout:
+            MDBoxLayout:
                 MDLabel:
                     text: "Settings"
                     halign: "center"
