@@ -1,9 +1,9 @@
 from kivy.lang import Builder # Builds the KV statement
 from kivymd.app import MDApp # How to actually run the code
 from kivy.clock import Clock # Allows for functions to be scheduled (useful for stuff that involves networking, in this case Gemini)
-from threading import Thread # Allows for the use of threading (separate code executions, useful for running multiple things at once)
+from threading import Thread # Allows for the use of threading (separate code executions, useful for running multiple things at once).
+# Lets model our program as a kitchen, each thread would be a chef in a kitchen that is making a separate dish (threads are independent of each other).
 import webbrowser # Opens the default web browser with a link as a parameter
-import time # Pretty straightforward module; allows for anything time-based, in this case delaying a thread (a code execution)
 import specification_creator # My module that creates the subject specification using Google Gemini
 import requests # Validation of the Gemini API key
 import os # Deletes redundant database files (if it failed so that Gemini can regenerate it without SQLite operation issues)
@@ -13,7 +13,7 @@ KV = """
 MDScreen:
     Carousel:
         id: onboarding
-        loop: False
+        loop: False # If true, it will go on and on (which is not ideal)
         scroll_timeout: 0
 
         # Welcome Screen
@@ -21,7 +21,7 @@ MDScreen:
             orientation: "vertical"
             spacing: "24dp"
             padding: "32dp"
-            md_bg_color: self.theme_cls.backgroundColor
+            md_bg_color: self.theme_cls.backgroundColor # ALlows for dark mode in the future
 
             MDLabel:
                 text: "Welcome to Beevee!!!"
@@ -46,7 +46,7 @@ MDScreen:
             orientation: "vertical"
             spacing: "16dp"
             padding: "32dp"
-            md_bg_color: self.theme_cls.backgroundColor
+            md_bg_color: self.theme_cls.backgroundColor # Allows for dark mode in the future
             
             MDLabel:
                 text: "Please enter your Google Gemini API Key or get one if you don't (I am not giving you mine 😭)"
@@ -91,7 +91,7 @@ MDScreen:
             orientation: "vertical"
             spacing: "16dp"
             padding: "32dp"
-            md_bg_color: self.theme_cls.backgroundColor
+            md_bg_color: self.theme_cls.backgroundColor # Allows for dark mode in the future
 
             MDLabel:
                 id: subject_title
@@ -142,7 +142,7 @@ MDScreen:
         # Gemini Processing Page
         MDBoxLayout:
             orientation: "vertical"
-            md_bg_color: self.theme_cls.backgroundColor 
+            md_bg_color: self.theme_cls.backgroundColor # Allows for dark mode in the future
 
             MDLoadingIndicator:
                 id: indicator
@@ -162,7 +162,7 @@ MDScreen:
             orientation: "vertical"
             spacing: "24dp"
             padding: "32dp"
-            md_bg_color: self.theme_cls.backgroundColor
+            md_bg_color: self.theme_cls.backgroundColor # Allows for dark mode in the future
 
             MDLabel:
                 theme_font_name: "Custom"
@@ -190,9 +190,9 @@ class OnboardingScreen(MDApp):
     key = "" # This way the API Key can be accessed throughout the application
     def build(self):
         # Make spinner and buttons render properly
-        self.theme_cls.theme_style = "Light"
-        self.theme_cls.primary_palette = "Cyan"
-        self.theme_cls.primary_hue = "500"
+        self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
+        self.theme_cls.primary_palette = "Cyan" # The accent colour, might change this to a more 'bee-themed' colour
+        self.theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
 
         return Builder.load_string(KV)
 

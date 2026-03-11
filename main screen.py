@@ -95,6 +95,12 @@ MDBoxLayout:
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
+                
+                MDLabel:
+                    text: "Choose your database to edit and the editor will open here"
+                    halign: "center"
+                    theme_font_name: "Custom"
+                    font_name: "robotvar.ttf"
             
         MDScreen:
             name: "shop"
@@ -152,9 +158,9 @@ class NavItem(MDNavigationRailItem):
     
 class MainScreen(MDApp):
     def build(self):
-        self.theme_cls.theme_style = "Light"
-        self.theme_cls.primary_palette = "Cyan"
-        self.theme_cls.primary_hue = "500"
+        self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
+        self.theme_cls.primary_palette = "Cyan" # The accent colour, might change this to a more 'bee-themed' colour
+        self.theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
         root = Builder.load_string(KV)
         return root
     

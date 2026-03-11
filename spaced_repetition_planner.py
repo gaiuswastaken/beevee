@@ -3,7 +3,7 @@
 #Libraries
 import sqlite3
 import random
-from datetime import date, timedelta
+from datetime import date
 
 # Modulized so that I can call this from a GUI (hopefully this should be much simpler than)
 def spaced_repetition_recommendations(table:str):
@@ -15,7 +15,7 @@ def spaced_repetition_recommendations(table:str):
         #print(rows)
         return rows
         conn.close()
-
+        
 # This is mainly for debugging purposes, I will alter it so that it works by clicking a button
 all_subject_topics=spaced_repetition_recommendations("comp_sci.db")
 chosen_topics = []
@@ -26,19 +26,3 @@ print(chosen_topics)
 def test(table:str):
     conn = sqlite3.connect(table)
     conn.execute()
-    
-""" def SM2(q:int, n:int, EF:float, I:int):
-    if q >= 3 and q<=5:
-        if n == 0:
-            I = 1
-        elif n == 1:
-            I = 6
-        else:
-            I = round(I*EF)
-        n += 1
-    
-    EF = EF + (0.1 - (5-q) * (0.08 + (5 - q) * 0.02))
-    if EF < 1.3:
-        EF = 1.3
-    
-    return n, EF, I """
