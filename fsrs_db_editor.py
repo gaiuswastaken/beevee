@@ -451,7 +451,12 @@ def editor_main(database:str):
             )
             dlg.open()
         
-    if __name__ == "__main__":
-        DBEditorApp().run()
+    # launch the editor when editor_main is invoked
+    DBEditorApp().run()
 
-editor_main("further_maths_for_me.db")
+# also support running the module directly from command line
+if __name__ == "__main__":
+    import sys
+    db = sys.argv[1] if len(sys.argv) > 1 else None
+    if db:
+        editor_main(db)
