@@ -1,3 +1,4 @@
+# Libraries
 from kivy.lang import Builder # Builds the KV statement
 from kivymd.app import MDApp # How to actually run the code
 from kivy.clock import Clock # Allows for functions to be scheduled (useful for stuff that involves networking, in this case Gemini)
@@ -147,7 +148,7 @@ MDScreen:
             MDLoadingIndicator:
                 id: indicator
                 size_hint: None, None
-                size: dp(100), dp(100)
+                size: sp(100), sp(100)
                 pos_hint: {"center_x": 0.5, "center_y": 0.9}
 
             MDLabel:

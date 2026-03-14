@@ -1,5 +1,4 @@
-# Set this to the database file you want to edit (relative to this folder or absolute path)
-DB_FILE = "comp_sci.db"
+# Libraries
 from kivy.lang import Builder
 from kivy.properties import NumericProperty, StringProperty
 from kivy.properties import ListProperty

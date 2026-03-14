@@ -1,3 +1,4 @@
+# Libraries
 import os # For accessing the databases
 import glob # For searching the databases
 from kivy.lang import Builder # Builds the KV statement
@@ -7,6 +8,8 @@ from kivymd.uix.navigationrail import MDNavigationRailItem
 from kivymd.uix.list import MDListItem
 from kivy.uix.behaviors import ButtonBehavior
 from fsrs_db_editor import editor_main # My database editor
+import subprocess # How I can open my editor in a separate window
+import sys # Used to get the absolute path of the Python interpreter
 
 KV = """
 # Template class for the Rail item so that I dont have to repeat stuff multiple times
@@ -188,14 +191,16 @@ MDBoxLayout:
         
 """
 
+
 # This defines the class NavItem outside of the KV so that Kivy Understands what it is
 class NavItem(MDNavigationRailItem):
     text = StringProperty() # The text underneath the icon
     icon = StringProperty() # The icon used to depict the function of a page
     screen_name = StringProperty() # The name of the screen to display
-    
+
+# This defines the class DBItem outside the KV so Kivy understands it
 class DBItem(MDListItem, ButtonBehavior):
-    text = StringProperty() # The text used to show the databases' app
+    text = StringProperty() # The text used to show the databases' name
     
     
 class MainScreen(MDApp):
@@ -204,23 +209,31 @@ class MainScreen(MDApp):
         self.theme_cls.primary_palette = "Cyan" # The accent colour, might change this to a more 'bee-themed' colour
         self.theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
         root = Builder.load_string(KV)
+        self.process = None # Flag for checking if DBEditor is open
         return root
     
     def openDB(self, text):
         print(f"Opening database: {text}")
-        # start the editor in a separate process so the current window stays open
-        import subprocess, sys
-        python = sys.executable
-        # pass the database filename as an argument
-        subprocess.Popen([python, "fsrs_db_editor.py", text])
-        # optionally you could also call editor_main(text) if you want an in‑process run
+        # Starts the editor in a separate process so the current window stays open
+        python = sys.executable # The absolute path (independent of the users drive-tree layout) of the Python interpreter running the editor
+        # Passes the name of the database (a string) as an argument
+        if self.process and self.process.poll() is None:
+            self.process.terminate() # 'Graceful Termination' - An algorithmic way of 'Press the red button to close me'
+            try:
+                self.process.wait(timeout=3) # Ensures old data is cleaned up
+            except subprocess.TimeoutExpired: # If the DBEditor is being unresponsive (a fail-safe)
+                self.process.kill() # 'Forceful Termination' - Kind of like how you kill an unresponsive app from Task Manager (or the Mac/Linux equivalents)
+            
+        self.process = subprocess.Popen([python, "fsrs_db_editor.py", text])
+            
+        
         
     def on_start(self):
-        
-        databases = glob.glob("*.db")
+        # Creates the database list
+        databases = glob.glob("*.db") # Finds all the databases in the current directory
         for db in databases:
             item = DBItem(text=db)
-            # on_release sends the widget instance as first arg, so capture db separately
+            # The function on_release sends the ListItem instance as first argument, so capture db separately
             item.bind(on_release=lambda instance, db=db: self.openDB(db))
             self.root.ids.dblist.add_widget(item)
     

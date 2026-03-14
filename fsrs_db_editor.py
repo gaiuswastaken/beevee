@@ -1,3 +1,4 @@
+# Libraries
 from kivy.lang import Builder # This applies the formatting defined on KV
 from kivy.properties import NumericProperty, StringProperty # Kivy has an easier way to set th datatypes of properties than stock python
 from kivy.properties import ListProperty # Same with lists. 
@@ -51,9 +52,9 @@ MDScreen:
                     Image:
                         source: app._grade_img_path(1)
                         size_hint_x: None
-                        width: dp(20)
+                        width: sp(20)
                         size_hint_y: None
-                        height: dp(20)
+                        height: sp(20)
                         pos_hint: {'center_y': .5}
                 BoxLayout:
                     orientation: "horizontal"
@@ -69,9 +70,9 @@ MDScreen:
                     Image:
                         source: app._grade_img_path(2)
                         size_hint_x: None
-                        width: dp(20)
+                        width: sp(20)
                         size_hint_y: None
-                        height: dp(20)
+                        height: sp(20)
                         pos_hint: {'center_y': .5}
                 BoxLayout:
                     orientation: "horizontal"
@@ -87,9 +88,9 @@ MDScreen:
                     Image:
                         source: app._grade_img_path(3)
                         size_hint_x: None
-                        width: dp(20)
+                        width: sp(20)
                         size_hint_y: None
-                        height: dp(20)
+                        height: sp(20)
                         pos_hint: {'center_y': .5}
                 BoxLayout:
                     orientation: "horizontal"
@@ -105,9 +106,9 @@ MDScreen:
                     Image:
                         source: app._grade_img_path(4)
                         size_hint_x: None
-                        width: dp(20)
+                        width: sp(20)
                         size_hint_y: None
-                        height: dp(20)
+                        height: sp(20)
                         pos_hint: {'center_y': .5}
         BoxLayout:
             size_hint_y: None
@@ -152,7 +153,7 @@ MDScreen:
             id: rv
             viewclass: 'TopicRow'
             RecycleBoxLayout:
-                default_size: None, dp(40)
+                default_size: None, sp(40)
                 default_size_hint: 1, None
                 size_hint_y: None
                 height: self.minimum_height
@@ -215,7 +216,7 @@ MDScreen:
         Image:
             source: root.col4_src
             size_hint: None, None
-            size: dp(24), dp(24)
+            size: sp(24), sp(24)
             pos_hint: {'center_x': .5, 'center_y': .5}
     MDLabel:
         text: root.col7
