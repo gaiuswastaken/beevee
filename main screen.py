@@ -2,6 +2,11 @@
 from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
+# Forces 720p, scaling issues are a nightmare to fix
+Config.set("graphics", "width", "1280")
+Config.set("graphics", "height", "720")
+Config.set("graphics", "resizable", "0")
+
 # Libraries
 import os # For accessing the databases
 import glob # For searching the databases
@@ -60,21 +65,19 @@ KV = """
         size_hint: None, 1
         MDBoxLayout:
             size_hint: None, None
-            width: dp(200)
+            width: 0.4 * self.parent.parent.height
             spacing: "25dp"
-            height: dp(200)
+            height: 0.4 * self.parent.parent.height
             pos_hint: {"center_x": 0.5,"center_y": 0.75}
             radius: 20
             md_bg_color: app.theme_cls.secondaryContainerColor
             
         MDLabel:
-            pos_hint: {"center_x": 0.5}
-            y: dp(-5)
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
             halign: "center"
             text: root.text
             theme_font_name: "Custom"
             font_name: "robotvar.ttf"
-        
         
 MDBoxLayout:
 
@@ -157,9 +160,13 @@ MDBoxLayout:
                 
                 # Where the databases are listed   
                 MDScrollView:
+                    scroll_type: ['bars', 'content']
+                    bar_color: app.theme_cls.secondaryColor        # color when scrolling
+                    bar_color_inactive: app.theme_cls.secondaryColor
                     pos_hint: {"center_x": 0.5, "center_y": 0.5}
                     size_hint: 0.5, 0.5
                     do_scroll_x: False
+                    bar_width: dp(4)
                     MDBoxLayout:
                         id: dblist
                         orientation: "vertical"
@@ -185,11 +192,15 @@ MDBoxLayout:
                 #size_hint_y: None
                 
                 MDScrollView:
+                    scroll_type: ['bars', 'content']
+                    bar_color: app.theme_cls.secondaryColor           # color when scrolling
+                    bar_color_inactive: app.theme_cls.secondaryColor
                     size_hint: None, None
                     width: root.width * 0.85
                     height: root.height * 0.85
                     do_scroll_x: True
                     do_scroll_y: False
+                    bar_width: dp(4)
                     padding: dp(10)
 
                     MDGridLayout:

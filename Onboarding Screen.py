@@ -2,6 +2,11 @@
 from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
+# Forces 720p, scaling issues are a nightmare to fix
+Config.set("graphics", "width", "1280")
+Config.set("graphics", "height", "720")
+Config.set("graphics", "resizable", "0")
+
 # Libraries
 from kivy.lang import Builder # Builds the KV statement
 from kivymd.app import MDApp # How to actually run the code
