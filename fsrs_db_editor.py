@@ -355,6 +355,7 @@ def editor_main(database:str):
                 self.load_topics()
 
             # What dlg does is that it opens a KivyMD dialog (notice there is no -ue) that prompts the user to update the grade for the topic
+            # 'lambda' is a way for a small function to be defined without a name. There is no main benefit apart from making my (long) code shorter
             dlg = MDDialog(
                 MDDialogHeadlineText(text=f"Set Grades 1-4, 1 being hardest and 4 being easiest for Topic {topic_id}"),
                 MDDialogSupportingText(text="Choose new grade:"),
@@ -362,7 +363,7 @@ def editor_main(database:str):
                     MDButton(
                         MDButtonText(text="Cancel"),
                         style="text",
-                        on_release=lambda *a: dlg.dismiss(),
+                        on_release=lambda *a: dlg.dismiss(), 
                     ),
                     MDButton(
                         MDButtonText(text="1"),
@@ -446,7 +447,7 @@ def editor_main(database:str):
                 MDDialogHeadlineText(text="Error"),
                 MDDialogSupportingText(text=message),
                 MDDialogButtonContainer(
-                    MDButton(MDButtonText(text="OK"), style="text", on_release=lambda *a: dlg.dismiss()),
+                    MDButton(MDButtonText(text="OK"), style="text", on_release=lambda *a: dlg.dismiss()), 
                 ),
                 size_hint=(0.9, None),
             )

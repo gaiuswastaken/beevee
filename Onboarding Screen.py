@@ -271,7 +271,7 @@ class OnboardingScreen(MDApp):
             errors = specification_creator.sub_list_gen(url, subject, api_key_param)
         except Exception as e:
             errors = [f"Internal error: {e}"]
-
+        # 'lambda' is a way for a small function to be defined without a name. There is no main benefit apart from making my (long) code shorter
         Clock.schedule_once(lambda dt: self.finish_gemini(subject, errors))
 
     def finish_gemini(self, subject, result):

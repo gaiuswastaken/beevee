@@ -114,7 +114,7 @@ class DBEditorApp(MDApp):
                 return
             self.dialog.dismiss()
             self.load_topics()
-
+        # 'lambda' is a way for a small function to be defined without a name. There is no main benefit apart from making my (long) code shorter
         dlg = MDDialog(
             MDDialogHeadlineText(text=f"Set R/A/G for Topic {topic_id}"),
             MDDialogSupportingText(text="Choose new RAG value:"),

@@ -1,3 +1,7 @@
+# Prevents the weird red dots from appearing when I hold the middle mouse button or start scrolling with the Ctrl key held (multi-touch emulation which is redundant for my purpose; a desktop app)
+from kivy.config import Config
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
+
 # Libraries
 import os # For accessing the databases
 import glob # For searching the databases
@@ -7,9 +11,12 @@ from kivy.properties import StringProperty # For properties that are strings suc
 from kivymd.uix.navigationrail import MDNavigationRailItem
 from kivymd.uix.list import MDListItem
 from kivy.uix.behaviors import ButtonBehavior
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.label import MDLabel
 from fsrs_db_editor import editor_main # My database editor
 import subprocess # How I can open my editor in a separate window
 import sys # Used to get the absolute path of the Python interpreter
+from colour_palette import colourScheme # My colour palette for the GUI
 
 KV = """
 # Template class for the Rail item so that I dont have to repeat stuff multiple times
@@ -34,6 +41,31 @@ KV = """
     divider: True
     MDListItemSupportingText:
         text: root.text
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
+        
+# Creates a new class called EggFrame where I can just clone the control variables and alter stuff like image and text and tooltip text
+<EggFrame>:
+    size_hint: None, 1
+    width: dp(350)
+    spacing: dp(25)
+    height: self.parent.height
+    radius: 20
+    md_bg_color: app.theme_cls.primaryContainerColor
+    
+    MDBoxLayout:
+        size_hint: None, None
+        width: dp(200)
+        spacing: dp(25)
+        height: dp(200)
+        pos_hint: {"center_y": 0.75}
+        radius: 20
+        md_bg_color: app.theme_cls.secondaryContainerColor
+        
+    MDLabel:
+        text: root.text
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
         
         
 MDBoxLayout:
@@ -42,50 +74,38 @@ MDBoxLayout:
         type: "unselected" # Never shows the label (only way that I can get larger padding :( )
         spacing: "8dp"
         padding: "8dp"
-        md_bg_color: app.theme_cls.secondaryContainerColor
+        md_bg_color: app.theme_cls.primaryContainerColor
 
         NavItem:
             icon: "text-box-edit"
             text: "Editor"
             screen_name: "editor"
-            theme_font_name: "Custom"
-            font_name: "robotvar.ttf"
+            
 
         NavItem:
             icon: "store"
             text: "Shop"
             screen_name: "shop"
-            theme_font_name: "Custom"
-            font_name: "robotvar.ttf"
 
         NavItem:
             icon: "home"
             text: "Tasks"
             screen_name: "home"
-            theme_font_name: "Custom"
-            font_name: "robotvar.ttf"
-            
 
         NavItem:
             icon: "bag-personal"
             text: "Inventory"
             screen_name: "inventory"
-            theme_font_name: "Custom"
-            font_name: "robotvar.ttf"
 
         NavItem:
             icon: "book"
             text: "Index"
             screen_name: "index"
-            theme_font_name: "Custom"
-            font_name: "robotvar.ttf"
 
         NavItem:
             icon: "cog"
             text: "Settings"
             screen_name: "settings"
-            theme_font_name: "Custom"
-            font_name: "robotvar.ttf"
 
     MDScreenManager:
         id: screen_manager
@@ -142,12 +162,56 @@ MDBoxLayout:
         # The Shop            
         MDScreen:
             name: "shop"
-            MDBoxLayout:
-                MDLabel:
-                    text: "Shop"
-                    halign: "center"
-                    theme_font_name: "Custom"
-                    font_name: "robotvar.ttf"
+            MDLabel:
+                text: "Shop"
+                pos_hint: {"center_y": 0.95}
+                halign: "center"
+                theme_font_name: "Custom"
+                font_style: "Headline"
+                role: "small"
+                font_name: "robotvar.ttf"
+    
+            MDAnchorLayout:
+                anchor_x: "center"
+                anchor_y: "center"
+                #size_hint_y: None
+                
+                MDScrollView:
+                    size_hint: None, None
+                    width: root.width * 0.85
+                    height: root.height * 0.85
+                    do_scroll_x: True
+                    do_scroll_y: False
+                    padding: dp(10)
+
+                    MDGridLayout:
+                        id: shop_grid
+                        rows: 1
+                        size_hint_x: None
+                        radius: 20
+                        height: self.parent.height
+                        md_bg_color: app.theme_cls.primaryColor
+                        # important: use max between minimum and parent width
+                        width: max(self.minimum_width, self.parent.width)
+
+                        spacing: dp(25)
+                        padding: dp(10)
+
+                        EggFrame:
+                            text: "Starter"
+                        
+                        EggFrame:
+                            text: "Rare"
+                        
+                        EggFrame:
+                            text: "Epic"
+                                       
+                        EggFrame:
+                            text: "Legendary"
+                            
+                        EggFrame:
+                            text: "Mythic" 
+                                
         
         # The homepage - where the tasks are shown
         MDScreen:
@@ -202,12 +266,24 @@ class NavItem(MDNavigationRailItem):
 class DBItem(MDListItem, ButtonBehavior):
     text = StringProperty() # The text used to show the databases' name
     
+# This defines the EggFrame
+class EggFrame(MDBoxLayout):
+    text = StringProperty()
+    
     
 class MainScreen(MDApp):
     def build(self):
+        # Defines theme colours (adds a lot of lines :O )
         self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
-        self.theme_cls.primary_palette = "Cyan" # The accent colour, might change this to a more 'bee-themed' colour
-        self.theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
+        # Saves time from me writing self.theme_cls like 20 times
+        theme = self.theme_cls
+        
+        for key, value in colourScheme.items():
+            attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention. Learn more about it here: https://m3.material.io/
+            if hasattr(theme, attr):
+                setattr(theme, attr, value)
+        
+        # theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
         root = Builder.load_string(KV)
         self.process = None # Flag for checking if DBEditor is open
         return root
@@ -234,7 +310,7 @@ class MainScreen(MDApp):
         for db in databases:
             item = DBItem(text=db)
             # The function on_release sends the ListItem instance as first argument, so capture db separately
-            item.bind(on_release=lambda instance, db=db: self.openDB(db))
+            item.bind(on_release=lambda instance, db=db: self.openDB(db)) # 'lambda' is a way for a small function to be defined without a name. There is no main benefit apart from making my (long) code shorter
             self.root.ids.dblist.add_widget(item)
     
 
