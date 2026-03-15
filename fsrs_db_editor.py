@@ -1,3 +1,7 @@
+# Prevents the weird red dots from appearing when I hold the middle mouse button or start scrolling with the Ctrl key held (multi-touch emulation which is redundant for my purpose; a desktop app)
+from kivy.config import Config
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
+
 # Libraries
 from kivy.lang import Builder # This applies the formatting defined on KV
 from kivy.properties import NumericProperty, StringProperty # Kivy has an easier way to set th datatypes of properties than stock python
@@ -14,9 +18,11 @@ from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogSupporting
 from kivymd.uix.button import MDButton, MDButtonText
 import db_helper # Has a function that allows the data to be extracted from the SQL database without the need to converge SQL and Python in the editor
 from pathlib import Path
+from colour_palette import colourScheme
+
 KV = """
 MDScreen:
-    md_bg_color: 1,1,1,1
+    md_bg_color: app.theme_cls.backgroundColor
     MDBoxLayout:
         orientation: "vertical"
         MDBoxLayout:
@@ -27,6 +33,8 @@ MDScreen:
             MDLabel:
                 text: "DB Editor"
                 halign: "left"
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
             BoxLayout:
                 orientation: "horizontal"
                 size_hint_x: None
@@ -38,6 +46,8 @@ MDScreen:
                     width: "36dp"
                     halign: "left"
                     valign: "middle"
+                    theme_font_name: "Custom"
+                    font_name: "robotvar.ttf"
                 BoxLayout:
                     orientation: "horizontal"
                     size_hint_x: None
@@ -49,6 +59,8 @@ MDScreen:
                         width: "60dp"
                         halign: "left"
                         valign: "middle"
+                        theme_font_name: "Custom"
+                        font_name: "robotvar.ttf"
                     Image:
                         source: app._grade_img_path(1)
                         size_hint_x: None
@@ -67,6 +79,8 @@ MDScreen:
                         width: "60dp"
                         halign: "left"
                         valign: "middle"
+                        theme_font_name: "Custom"
+                        font_name: "robotvar.ttf"
                     Image:
                         source: app._grade_img_path(2)
                         size_hint_x: None
@@ -85,6 +99,8 @@ MDScreen:
                         width: "60dp"
                         halign: "left"
                         valign: "middle"
+                        theme_font_name: "Custom"
+                        font_name: "robotvar.ttf"
                     Image:
                         source: app._grade_img_path(3)
                         size_hint_x: None
@@ -103,6 +119,8 @@ MDScreen:
                         width: "60dp"
                         halign: "left"
                         valign: "middle"
+                        theme_font_name: "Custom"
+                        font_name: "robotvar.ttf"
                     Image:
                         source: app._grade_img_path(4)
                         size_hint_x: None
@@ -117,7 +135,7 @@ MDScreen:
             padding: 0
             canvas.before:
                 Color:
-                    rgba: .95, .95, .95, 1
+                    rgba: app.theme_cls.surfaceVariantColor
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -125,30 +143,44 @@ MDScreen:
                 text: "ID"
                 size_hint_x: 0.04
                 halign: 'left'
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
             MDLabel:
                 text: "MainCategory"
                 size_hint_x: 0.12
                 halign: 'left'
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
             MDLabel:
                 text: "SubCategory"
                 size_hint_x: 0.12
                 halign: 'left'
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
             MDLabel:
                 text: "TopicDetail"
                 size_hint_x: 0.35
                 halign: 'left'
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
             MDLabel:
                 text: "Grade"
                 size_hint_x: 0.06
                 halign: 'left'
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
             MDLabel:
                 text: "Reviewed"
                 size_hint_x: 0.09
                 halign: 'left'
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
             MDLabel:
                 text: "To Review"
                 size_hint_x: 0.09
                 halign: 'left'
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
         RecycleView:
             id: rv
             viewclass: 'TopicRow'
@@ -164,6 +196,7 @@ MDScreen:
             padding: "8dp"
             Button:
                 text: "Refresh"
+                font_name: "robotvar.ttf"
                 on_release: app.load_topics()
 
 <TopicRow>:
@@ -182,6 +215,8 @@ MDScreen:
         font_size: '14sp'
         text_size: self.size
         valign: 'middle'
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
     MDLabel:
         text: root.col1
         size_hint_x: 0.12
@@ -191,6 +226,8 @@ MDScreen:
         font_size: '14sp'
         text_size: self.size
         valign: 'middle'
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
     MDLabel:
         text: root.col2
         size_hint_x: 0.12
@@ -200,6 +237,8 @@ MDScreen:
         font_size: '14sp'
         text_size: self.size
         valign: 'middle'
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
     MDLabel:
         text: root.col3
         size_hint_x: 0.35
@@ -209,6 +248,8 @@ MDScreen:
         font_size: '14sp'
         text_size: self.size
         valign: 'middle'
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
     BoxLayout:
         size_hint_x: 0.06
         size_hint_y: 1
@@ -227,6 +268,8 @@ MDScreen:
         font_size: '14sp'
         text_size: self.size
         valign: 'middle'
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
     MDLabel:
         text: root.col8
         size_hint_x: 0.09
@@ -236,6 +279,8 @@ MDScreen:
         font_size: '14sp'
         text_size: self.size
         valign: 'middle'
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
 """
 
 def editor_main(database:str):
@@ -283,7 +328,13 @@ def editor_main(database:str):
 
         def build(self):
             self.theme_cls.theme_style = "Light"
-            self.theme_cls.primary_palette = "Blue"
+            # Saves time from me writing self.theme_cls like 20 times
+            theme = self.theme_cls
+            
+            for key, value in colourScheme.items():
+                attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention. Learn more about it here: https://m3.material.io/
+                if hasattr(theme, attr):
+                    setattr(theme, attr, value)
             return Builder.load_string(KV)
 
         def on_start(self):
@@ -304,7 +355,7 @@ def editor_main(database:str):
             data = []
             # idx is simply the index in the list 'rows' and r is just the individual row
             for idx, r in enumerate(rows):
-                bgcolor = (0.98, 0.98, 0.995, 1) if idx % 2 else (1, 1, 1, 1)
+                bgcolor = self.theme_cls.surfaceVariantColor if idx % 2 else self.theme_cls.surfaceColor
                 grade = r.get('Grade')
                 data.append(
                     {
@@ -357,31 +408,31 @@ def editor_main(database:str):
             # What dlg does is that it opens a KivyMD dialog (notice there is no -ue) that prompts the user to update the grade for the topic
             # 'lambda' is a way for a small function to be defined without a name. There is no main benefit apart from making my (long) code shorter
             dlg = MDDialog(
-                MDDialogHeadlineText(text=f"Set Grades 1-4, 1 being hardest and 4 being easiest for Topic {topic_id}"),
-                MDDialogSupportingText(text="Choose new grade:"),
+                MDDialogHeadlineText(text=f"Set Grades 1-4, 1 being hardest and 4 being easiest for Topic {topic_id}", theme_font_name="Custom", font_name="robotvar.ttf"),
+                MDDialogSupportingText(text="Choose new grade:", theme_font_name="Custom", font_name="robotvar.ttf"),
                 MDDialogButtonContainer(
                     MDButton(
-                        MDButtonText(text="Cancel"),
+                        MDButtonText(text="Cancel", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: dlg.dismiss(), 
                     ),
                     MDButton(
-                        MDButtonText(text="1"),
+                        MDButtonText(text="1", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: _do_update(1),
                     ),
                     MDButton(
-                        MDButtonText(text="2"),
+                        MDButtonText(text="2", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: _do_update(2),
                     ),
                     MDButton(
-                        MDButtonText(text="3"),
+                        MDButtonText(text="3", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: _do_update(3),
                     ),
                     MDButton(
-                        MDButtonText(text="4"),
+                        MDButtonText(text="4", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: _do_update(4),
                     ),
@@ -407,31 +458,31 @@ def editor_main(database:str):
                 self.load_topics()
 
             dlg = MDDialog(
-                MDDialogHeadlineText(text=f"Set Grades 1-4, 1 being hardest and 4 being easiest for Topic {topic_id}"),
-                MDDialogSupportingText(text="Choose new grade:"),
+                MDDialogHeadlineText(text=f"Set Grades 1-4, 1 being hardest and 4 being easiest for Topic {topic_id}", theme_font_name="Custom", font_name="robotvar.ttf"),
+                MDDialogSupportingText(text="Choose new grade:", theme_font_name="Custom", font_name="robotvar.ttf"),
                 MDDialogButtonContainer(
                     MDButton(
-                        MDButtonText(text="Cancel"),
+                        MDButtonText(text="Cancel", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: dlg.dismiss(),
                     ),
                     MDButton(
-                        MDButtonText(text="1"),
+                        MDButtonText(text="1", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: _do_update(1),
                     ),
                     MDButton(
-                        MDButtonText(text="2"),
+                        MDButtonText(text="2", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: _do_update(2),
                     ),
                     MDButton(
-                        MDButtonText(text="3"),
+                        MDButtonText(text="3", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: _do_update(3),
                     ),
                     MDButton(
-                        MDButtonText(text="4"),
+                        MDButtonText(text="4", theme_font_name="Custom", font_name="robotvar.ttf"),
                         style="text",
                         on_release=lambda *a: _do_update(4),
                     ),
@@ -444,10 +495,10 @@ def editor_main(database:str):
         # Updates dlg if there are errors and shows the user the error   
         def _show_error(self, message: str):
             dlg = MDDialog(
-                MDDialogHeadlineText(text="Error"),
-                MDDialogSupportingText(text=message),
+                MDDialogHeadlineText(text="Error", theme_font_name="Custom", font_name="robotvar.ttf"),
+                MDDialogSupportingText(text=message, theme_font_name="Custom", font_name="robotvar.ttf"),
                 MDDialogButtonContainer(
-                    MDButton(MDButtonText(text="OK"), style="text", on_release=lambda *a: dlg.dismiss()), 
+                    MDButton(MDButtonText(text="OK", theme_font_name="Custom", font_name="robotvar.ttf"), style="text", on_release=lambda *a: dlg.dismiss()), 
                 ),
                 size_hint=(0.9, None),
             )

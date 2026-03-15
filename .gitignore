@@ -34,3 +34,5 @@ OFL.txt
 rubik.ttf
 tempCodeRunnerFile.python
 text_fields_test.kv
+db_editor_main.py
+db_editor.kv

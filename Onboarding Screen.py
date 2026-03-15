@@ -1,3 +1,7 @@
+# Prevents the weird red dots from appearing when I hold the middle mouse button or start scrolling with the Ctrl key held (multi-touch emulation which is redundant for my purpose; a desktop app)
+from kivy.config import Config
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
+
 # Libraries
 from kivy.lang import Builder # Builds the KV statement
 from kivymd.app import MDApp # How to actually run the code
@@ -8,6 +12,7 @@ import webbrowser # Opens the default web browser with a link as a parameter
 import specification_creator # My module that creates the subject specification using Google Gemini
 import requests # Validation of the Gemini API key
 import os # Deletes redundant database files (if it failed so that Gemini can regenerate it without SQLite operation issues)
+from colour_palette import colourScheme # My colour palette for the GUI
 
 
 KV = """
@@ -192,9 +197,16 @@ class OnboardingScreen(MDApp):
     def build(self):
         # Make spinner and buttons render properly
         self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
-        self.theme_cls.primary_palette = "Cyan" # The accent colour, might change this to a more 'bee-themed' colour
-        self.theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
-
+        #self.theme_cls.primary_palette = "Cyan" # The accent colour, might change this to a more 'bee-themed' colour
+        #self.theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
+        # Saves time from me writing self.theme_cls like 20 times
+        theme = self.theme_cls
+        
+        for key, value in colourScheme.items():
+            attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention. Learn more about it here: https://m3.material.io/
+            if hasattr(theme, attr):
+                setattr(theme, attr, value)
+                
         return Builder.load_string(KV)
 
     def on_start(self):
