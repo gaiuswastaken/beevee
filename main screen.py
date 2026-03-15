@@ -47,25 +47,33 @@ KV = """
 # Creates a new class called EggFrame where I can just clone the control variables and alter stuff like image and text and tooltip text
 <EggFrame>:
     size_hint: None, 1
-    width: dp(350)
-    spacing: dp(25)
-    height: self.parent.height
+    #spacing: dp(25)
     radius: 20
+    height: self.parent.height
+    width: root.height *0.75
     md_bg_color: app.theme_cls.primaryContainerColor
     
-    MDBoxLayout:
-        size_hint: None, None
-        width: dp(200)
-        spacing: dp(25)
-        height: dp(200)
-        pos_hint: {"center_y": 0.75}
-        radius: 20
-        md_bg_color: app.theme_cls.secondaryContainerColor
-        
-    MDLabel:
-        text: root.text
-        theme_font_name: "Custom"
-        font_name: "robotvar.ttf"
+    RelativeLayout: # Makes positioning things much easier
+        width: root.height * 0.75
+        height: self.parent.height
+        md_bg_color: app.theme_cls.tertiaryColor
+        size_hint: None, 1
+        MDBoxLayout:
+            size_hint: None, None
+            width: dp(200)
+            spacing: "25dp"
+            height: dp(200)
+            pos_hint: {"center_x": 0.5,"center_y": 0.75}
+            radius: 20
+            md_bg_color: app.theme_cls.secondaryContainerColor
+            
+        MDLabel:
+            pos_hint: {"center_x": 0.5}
+            y: dp(-5)
+            halign: "center"
+            text: root.text
+            theme_font_name: "Custom"
+            font_name: "robotvar.ttf"
         
         
 MDBoxLayout:
@@ -191,8 +199,8 @@ MDBoxLayout:
                         radius: 20
                         height: self.parent.height
                         md_bg_color: app.theme_cls.primaryColor
-                        # important: use max between minimum and parent width
                         width: max(self.minimum_width, self.parent.width)
+                        
 
                         spacing: dp(25)
                         padding: dp(10)
@@ -202,7 +210,7 @@ MDBoxLayout:
                         
                         EggFrame:
                             text: "Rare"
-                        
+                            
                         EggFrame:
                             text: "Epic"
                                        
@@ -269,7 +277,6 @@ class DBItem(MDListItem, ButtonBehavior):
 # This defines the EggFrame
 class EggFrame(MDBoxLayout):
     text = StringProperty()
-    
     
 class MainScreen(MDApp):
     def build(self):
