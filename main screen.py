@@ -13,6 +13,7 @@ import glob # For searching the databases
 from kivy.lang import Builder # Builds the KV statement
 from kivymd.app import MDApp # How to actually run the code
 from kivy.properties import StringProperty # For properties that are strings such as MDNavigationRailItemIcoon
+#from kivy.properties import NumericProperty
 from kivymd.uix.navigationrail import MDNavigationRailItem
 from kivymd.uix.list import MDListItem
 from kivy.uix.behaviors import ButtonBehavior
@@ -73,11 +74,37 @@ KV = """
             md_bg_color: app.theme_cls.secondaryContainerColor
             
         MDLabel:
+            id: name
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             halign: "center"
-            text: root.text
+            text: root.name
             theme_font_name: "Custom"
             font_name: "robotvar.ttf"
+            
+        MDLabel:
+            id: cost
+            pos_hint: {"center_x": 0.5, "center_y": 0.35}
+            halign: "center"
+            text: root.cost
+            theme_font_name: "Custom"
+            font_name: "robotvar.ttf"
+            
+        MDButton:
+            pos_hint: {"center_x": 0.5, "center_y": 0.25}
+            halign: "center"
+            style: "tonal"
+            
+            MDButtonIcon:
+                icon: "shopping"
+                
+            MDButtonText:
+                text: "Buy"
+                #pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                halign: "center"
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
+                
+
         
 MDBoxLayout:
 
@@ -193,7 +220,7 @@ MDBoxLayout:
                 
                 MDScrollView:
                     scroll_type: ['bars', 'content']
-                    bar_color: app.theme_cls.secondaryColor           # color when scrolling
+                    bar_color: app.theme_cls.secondaryColor        
                     bar_color_inactive: app.theme_cls.secondaryColor
                     size_hint: None, None
                     width: root.width * 0.85
@@ -217,19 +244,24 @@ MDBoxLayout:
                         padding: dp(10)
 
                         EggFrame:
-                            text: "Starter"
+                            name: "Starter"
+                            cost: "1 Coin"
                         
                         EggFrame:
-                            text: "Rare"
+                            name: "Rare"
+                            cost: "2 Coins"
                             
                         EggFrame:
-                            text: "Epic"
+                            name: "Epic"
+                            cost: "3 Coins"
                                        
                         EggFrame:
-                            text: "Legendary"
+                            name: "Legendary"
+                            cost: "4 Coins"
                             
                         EggFrame:
-                            text: "Mythic" 
+                            name: "Mythic" 
+                            cost: "5 Coins"
                                 
         
         # The homepage - where the tasks are shown
@@ -287,7 +319,8 @@ class DBItem(MDListItem, ButtonBehavior):
     
 # This defines the EggFrame
 class EggFrame(MDBoxLayout):
-    text = StringProperty()
+    name = StringProperty()
+    cost = StringProperty()
     
 class MainScreen(MDApp):
     def build(self):
