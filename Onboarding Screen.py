@@ -18,6 +18,7 @@ import specification_creator # My module that creates the subject specification 
 import requests # Validation of the Gemini API key
 import os # Deletes redundant database files (if it failed so that Gemini can regenerate it without SQLite operation issues)
 from colour_palette import colourScheme # My colour palette for the GUI
+from currency_manager import create_honeycomb_currency_db
 
 
 KV = """
@@ -216,6 +217,7 @@ class OnboardingScreen(MDApp):
 
     def on_start(self):
         # Track which subject we're on (1..4)
+        create_honeycomb_currency_db()
         self.subject_index = 1
         self._update_subject_title()
 

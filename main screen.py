@@ -11,7 +11,7 @@ Config.set("graphics", "resizable", "0")
 from kivy.lang import Builder # Builds the KV statement
 from kivymd.app import MDApp # How to actually run the code
 from kivy.properties import StringProperty # For properties that are strings such as MDNavigationRailItemIcoon
-from kivy.properties import ListProperty # Same with lists. 
+from kivy.properties import ListProperty, NumericProperty # Same with lists. 
 from kivymd.uix.navigationrail import MDNavigationRailItem
 from kivymd.uix.list import MDListItem
 from kivy.uix.behaviors import ButtonBehavior
@@ -32,6 +32,7 @@ import sys # Used to get the absolute path of the Python interpreter
 import sqlite3 # I will need to create another database for the daily tasks (will need to find a way to prevent it appearing in the program)
 from datetime import date # Checks the age of the task
 from spaced_repetition_planner import spaced_repetition_recommendations # My module for the spaced repetition planner
+from currency_manager import * # My module for the currency system
 
 KV = """
 # Template class for the Rail item so that I dont have to repeat stuff multiple times
@@ -102,6 +103,7 @@ KV = """
             pos_hint: {"center_x": 0.5, "center_y": 0.25}
             halign: "center"
             style: "tonal"
+            on_release: app.buy_egg(root.name)
             
             MDButtonIcon:
                 icon: "shopping"
@@ -112,11 +114,43 @@ KV = """
                 halign: "center"
                 theme_font_name: "Custom"
                 font_name: "robotvar.ttf"
+
+<TaskItem>:
+    orientation: "horizontal"
+    adaptive_height: True
+    spacing: "10dp"
+    padding: "5dp"
+
+    MDLabel:
+        text: root.text
+        adaptive_height: True
+        pos_hint: {"center_y": .5}
+        theme_font_name: "Custom"
+        font_name: "robotvar.ttf"
+
+    MDButton:
+        theme_bg_color: "Custom"
+        md_bg_color: app.theme_cls.tertiaryColor
+        style: "tonal"
+        pos_hint: {"center_y": .5}
+        on_release: root.mark_complete()
+        
+        MDButtonIcon:
+            theme_icon_color: "Custom"
+            icon_color: app.theme_cls.surfaceColor
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            icon: "flag-checkered"
                 
+<CurrencyView>:
+    pos_hint: {"center_x": 0.85, "center_y": 0.975}
+    halign: "center"
+    theme_font_name: "Custom"
+    font_name: "robotvar.ttf"
+           
 <SubjectFrame>:
     orientation: 'vertical'
     size_hint: 1, None
-    height: dp(300)
+    adaptive_height: True
     radius: 20
     md_bg_color: app.theme_cls.tertiaryContainerColor
     
@@ -130,22 +164,12 @@ KV = """
         theme_font_name: "Custom"
         font_name: "robotvar.ttf"
 
-    MDScrollView:
-        do_scroll_x: False
-        do_scroll_y: True
-        scroll_type: ['bars', 'content']
-        bar_width: dp(4)
-        bar_color: app.theme_cls.secondaryColor
-        bar_color_inactive: app.theme_cls.secondaryColor
-        width: root.width
-        #height: self.parent.height
-        MDBoxLayout:
-            id: tasks_container
-            orientation: "vertical"
-            size_hint_y: None
-            height: self.minimum_height
-            padding: dp(10)
-            spacing: dp(5)
+    MDBoxLayout:
+        id: tasks_container
+        orientation: "vertical"
+        adaptive_height: True
+        padding: dp(10)
+        spacing: dp(5)
 
 MDBoxLayout:
 
@@ -253,6 +277,9 @@ MDBoxLayout:
                 font_style: "Headline"
                 role: "small"
                 font_name: "robotvar.ttf"
+            
+            CurrencyView:
+                text: f"Honeycombs: {int(app.honeycombs_balance)}"
     
             MDAnchorLayout:
                 anchor_x: "center"
@@ -308,6 +335,10 @@ MDBoxLayout:
         # The homepage - where the tasks are shown
         MDScreen:
             name: "home"
+            
+            CurrencyView:
+                text: f"Honeycombs: {int(app.honeycombs_balance)}"
+            
             MDAnchorLayout:
                 anchor_x: "center"
                 anchor_y: "center"
@@ -338,11 +369,6 @@ MDBoxLayout:
                         height: self.minimum_height
                         spacing: dp(15)
                         padding: dp(15)
-                # MDLabel:
-                #     text: "Tasks"
-                #     halign: "center"
-                #     theme_font_name: "Custom"
-                #     font_name: "robotvar.ttf"
         
         # The inventory
         MDScreen:
@@ -387,6 +413,17 @@ class NavItem(MDNavigationRailItem):
 class DBItem(MDListItem, ButtonBehavior):
     text = StringProperty() # The text used to show the databases' name
     
+class TaskItem(MDBoxLayout):
+    text = StringProperty()
+    
+    def mark_complete(self):
+        app = MDApp.get_running_app()
+        app.handle_task_completion(self)
+        
+class CurrencyView(MDLabel):
+    pass
+
+
 class SubjectFrame(MDBoxLayout):
     text = StringProperty()
     tasks = ListProperty()
@@ -397,15 +434,8 @@ class SubjectFrame(MDBoxLayout):
             return
         self.ids.tasks_container.clear_widgets()
         for task in self.tasks:
-            label = MDLabel(
-                text=f"- {task}",
-                halign="center",
-                theme_font_name="Custom",
-                font_name="robotvar.ttf",
-                adaptive_height=True,
-            )
-            label.bind(width=lambda instance, width: setattr(instance, 'text_size', (width, None)))
-            self.ids.tasks_container.add_widget(label)
+            item = TaskItem(text=f"- {task}")
+            self.ids.tasks_container.add_widget(item)
     
 # This defines the EggFrame
 class EggFrame(MDBoxLayout):
@@ -414,6 +444,7 @@ class EggFrame(MDBoxLayout):
     
 class MainScreen(MDApp):
     daily_tasks_db_name = "daily_tasks.db"
+    honeycombs_balance = NumericProperty(0)
 
     def build(self):
         # Defines theme colours (adds a lot of lines :O )
@@ -499,12 +530,53 @@ class MainScreen(MDApp):
         
         conn.close()
         return tasks_by_db
+    
+    def handle_task_completion(self, task_item):
+        # Remove "- " prefix to match DB entry
+        task_text = task_item.text.replace("- ", "", 1)
+        
+        conn = sqlite3.connect(self.daily_tasks_db_name)
+        cursor = conn.cursor()
+
+        # Delete the task from the daily_tasks database
+        cursor.execute("DELETE FROM daily_tasks WHERE task_detail = ?", (task_text,))
+        conn.commit()
+        conn.close()
+        
+        # Update currency and UI
+        update_honeycombs_after_task_completion()
+        self.update_balance()
+        
+        # Remove the widget from the list
+        if task_item.parent:
+            task_item.parent.remove_widget(task_item)
+            
+    def buy_egg(self, egg_name):
+        # Map egg names to their specific update functions from currency_manager. More secure than passing the value of the cost
+        # Using a dictionary is much more efficient than using a selection chain (the dictionary search is O(1) average case while the chain is O(n) average case)
+        mapping = {
+            "Starter": update_honeycombs_after_starter_egg_purchase,
+            "Rare": update_honeycombs_after_rare_egg_purchase,
+            "Epic": update_honeycombs_after_epic_egg_purchase,
+            "Legendary": update_honeycombs_after_legendary_egg_purchase,
+            "Mythic": update_honeycombs_after_mythic_egg_purchase
+        }
+        
+        if egg_name in mapping: # Dictionary lookup is O(1)
+            mapping[egg_name]() # Calls the specific function
+            self.update_balance() # Refreshes the label
+
+    def update_balance(self):
+        self.honeycombs_balance = get_honeycombs()
         
     def on_start(self):
+        self.update_balance()
         # Creates the database list for the editor
         databases = glob.glob("*.db")
-        if self.daily_tasks_db_name in databases:
+        if self.daily_tasks_db_name in databases: # Ensures that the daily tasks database does not appear in the list
             databases.remove(self.daily_tasks_db_name)
+        if "currency.db" in databases: # Ensures that the currency database does not appear in the list
+            databases.remove("currency.db")
 
         for db in databases:
             item = DBItem(text=db)
