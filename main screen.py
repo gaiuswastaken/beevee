@@ -11,6 +11,7 @@ Config.set("graphics", "resizable", "0")
 from kivy.lang import Builder # Builds the KV statement
 from kivymd.app import MDApp # How to actually run the code
 from kivy.properties import StringProperty # For properties that are strings such as MDNavigationRailItemIcoon
+from kivy.properties import ListProperty # Same with lists. 
 from kivymd.uix.navigationrail import MDNavigationRailItem
 from kivymd.uix.list import MDListItem
 from kivy.uix.behaviors import ButtonBehavior
@@ -24,10 +25,12 @@ import glob # For searching the databases
 from fsrs_db_editor import editor_main # My database editor
 import subprocess # How I can open my editor in a separate window
 import sys # Used to get the absolute path of the Python interpreter
+
 # Libraries for the shop screen
 
 # Libraries for the task screen
-from kivy.properties import DictProperty
+import sqlite3 # I will need to create another database for the daily tasks (will need to find a way to prevent it appearing in the program)
+from datetime import date # Checks the age of the task
 from spaced_repetition_planner import spaced_repetition_recommendations # My module for the spaced repetition planner
 
 KV = """
@@ -111,21 +114,38 @@ KV = """
                 font_name: "robotvar.ttf"
                 
 <SubjectFrame>:
+    orientation: 'vertical'
     size_hint: 1, None
-    #halign: center
-    #pos_hint: root.pos_hint_value
-    #spacing: dp(25)
+    height: dp(300)
     radius: 20
-    height: dp(160)
-    width: self.parent.height *0.45
-    md_bg_color: app.theme_cls.tertiaryColor
+    md_bg_color: app.theme_cls.tertiaryContainerColor
     
     MDLabel:
         text: root.text
-        pos_hint: {"center_x": 0.5, "center_y": 0.8}
+        size_hint_y: None
+        height: self.texture_size[1]
+        pos_hint: {"center_x": 0.5}
+        padding: dp(10)
         halign: "center"
         theme_font_name: "Custom"
         font_name: "robotvar.ttf"
+
+    MDScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+        scroll_type: ['bars', 'content']
+        bar_width: dp(4)
+        bar_color: app.theme_cls.secondaryColor
+        bar_color_inactive: app.theme_cls.secondaryColor
+        width: root.width
+        #height: self.parent.height
+        MDBoxLayout:
+            id: tasks_container
+            orientation: "vertical"
+            size_hint_y: None
+            height: self.minimum_height
+            padding: dp(10)
+            spacing: dp(5)
 
 MDBoxLayout:
 
@@ -209,7 +229,7 @@ MDBoxLayout:
                 # Where the databases are listed   
                 MDScrollView:
                     scroll_type: ['bars', 'content']
-                    bar_color: app.theme_cls.secondaryColor        # color when scrolling
+                    bar_color: app.theme_cls.secondaryColor        # The colour of the scrollbar when scrolling
                     bar_color_inactive: app.theme_cls.secondaryColor
                     pos_hint: {"center_x": 0.5, "center_y": 0.5}
                     size_hint: 0.5, 0.5
@@ -308,6 +328,8 @@ MDBoxLayout:
                     do_scroll_y: True
                     bar_width: dp(4)
                     padding: dp(10)
+                    width: root.width * 0.85
+                    height: root.height * 0.85
 
                     MDBoxLayout:
                         id: home_list
@@ -367,6 +389,23 @@ class DBItem(MDListItem, ButtonBehavior):
     
 class SubjectFrame(MDBoxLayout):
     text = StringProperty()
+    tasks = ListProperty()
+
+    # Starts when the task_container object is created 
+    def on_kv_post(self, base_widget):
+        if not hasattr(self, 'ids') or not self.ids or not 'tasks_container' in self.ids:
+            return
+        self.ids.tasks_container.clear_widgets()
+        for task in self.tasks:
+            label = MDLabel(
+                text=f"- {task}",
+                halign="center",
+                theme_font_name="Custom",
+                font_name="robotvar.ttf",
+                adaptive_height=True,
+            )
+            label.bind(width=lambda instance, width: setattr(instance, 'text_size', (width, None)))
+            self.ids.tasks_container.add_widget(label)
     
 # This defines the EggFrame
 class EggFrame(MDBoxLayout):
@@ -374,6 +413,8 @@ class EggFrame(MDBoxLayout):
     cost = StringProperty()
     
 class MainScreen(MDApp):
+    daily_tasks_db_name = "daily_tasks.db"
+
     def build(self):
         # Defines theme colours (adds a lot of lines :O )
         self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
@@ -403,20 +444,80 @@ class MainScreen(MDApp):
                 self.process.kill() # 'Forceful Termination' - Kind of like how you kill an unresponsive app from Task Manager (or the Mac/Linux equivalents)
             
         self.process = subprocess.Popen([python, "fsrs_db_editor.py", text])
-            
+    
+    # This function creates a new table called daily_tasks.db if it does not exist and then gets the day the task was created before invoking my spaced_repetition_planner.py to get three random tasks 
+    def setup_daily_tasks_db(self):
+        conn = sqlite3.connect(self.daily_tasks_db_name)
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS daily_tasks (
+                db_name TEXT,
+                task_detail TEXT
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS refresh_log (
+                last_refresh_date TEXT
+            )
+        ''')
+        # Check if refresh_log is empty and insert a dummy date if it is, it will get overidden after
+        cursor.execute("SELECT count(*) FROM refresh_log")
+        if cursor.fetchone()[0] == 0:
+            cursor.execute("INSERT INTO refresh_log (last_refresh_date) VALUES (?)", ("1970-01-01",))
+        conn.commit()
+        conn.close()
+
+    def get_daily_tasks(self):
+        self.setup_daily_tasks_db()
+        conn = sqlite3.connect(self.daily_tasks_db_name)
+        cursor = conn.cursor()
         
+        cursor.execute("SELECT last_refresh_date FROM refresh_log LIMIT 1")
+        last_refresh = cursor.fetchone()[0]
+        today_str = date.today().isoformat()
+
+        if last_refresh != today_str:
+            cursor.execute("DELETE FROM daily_tasks")
+            databases = glob.glob("*.db")
+            if self.daily_tasks_db_name in databases:
+                databases.remove(self.daily_tasks_db_name)
+
+            for db_name in databases:
+                tasks = spaced_repetition_recommendations(db_name)
+                for task in tasks:
+                    cursor.execute("INSERT INTO daily_tasks (db_name, task_detail) VALUES (?, ?)", (db_name, task[0]))
+            
+            cursor.execute("UPDATE refresh_log SET last_refresh_date = ?", (today_str,))
+            conn.commit()
+
+        cursor.execute("SELECT db_name, task_detail FROM daily_tasks")
+        tasks_by_db = {}
+        for db_name, task_detail in cursor.fetchall():
+            if db_name not in tasks_by_db:
+                tasks_by_db[db_name] = []
+            tasks_by_db[db_name].append((task_detail,))
+        
+        conn.close()
+        return tasks_by_db
         
     def on_start(self):
-        # Creates the database list
-        databases = glob.glob("*.db") # Finds all the databases in the current directory
+        # Creates the database list for the editor
+        databases = glob.glob("*.db")
+        if self.daily_tasks_db_name in databases:
+            databases.remove(self.daily_tasks_db_name)
+
         for db in databases:
             item = DBItem(text=db)
-            # The function on_release sends the ListItem instance as first argument, so capture db separately
+            # The function on_release sends the ListItem instance as first argument, so gets the db separately
             item.bind(on_release=lambda instance, db=db: self.openDB(db)) # 'lambda' is a way for a small function to be defined without a name. There is no main benefit apart from making my (long) code shorter
             self.root.ids.dblist.add_widget(item)
 
-        for db in databases: # 
-            subject_frame = SubjectFrame(text=os.path.splitext(db)[0])
+        # Creates the subject frames for the home screen
+        tasks_by_db = self.get_daily_tasks()
+        
+        for db in databases:
+            tasks = tasks_by_db.get(db, [])
+            subject_frame = SubjectFrame(text=os.path.splitext(db)[0], tasks=[task[0] for task in tasks])
             self.root.ids.home_list.add_widget(subject_frame)
     
 
