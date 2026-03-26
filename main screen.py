@@ -18,6 +18,9 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
 from colour_palette import colourScheme # My colour palette for the GUI
+from currency_manager import * # My module for the currency system
+from inventory_manager import * # My module for the inventory management system
+from index_manager import * # My module for the index management system
 
 # Libraries for the editor screen
 import os # For accessing the databases
@@ -33,7 +36,7 @@ import sqlite3 # I will need to create another database for the daily tasks (wil
 from datetime import date # Checks the age of the task
 import db_helper # Helper for updating grades
 from spaced_repetition_planner import spaced_repetition_recommendations # My module for the spaced repetition planner
-from currency_manager import * # My module for the currency system
+
 
 KV = """
 # Template class for the Rail item so that I dont have to repeat stuff multiple times
@@ -116,6 +119,7 @@ KV = """
                 theme_font_name: "Custom"
                 font_name: "robotvar.ttf"
 
+# Creates a frame for the tasks to be contained in
 <TaskItem>:
     orientation: "horizontal"
     size_hint_y: None
@@ -182,13 +186,15 @@ KV = """
                 font_name: "robotvar.ttf"
                 theme_text_color: "Custom"
                 text_color: app.theme_cls.onPrimaryContainerColor
-                
+
+# How the users balanced is displayed              
 <CurrencyView>:
     pos_hint: {"center_x": 0.85, "center_y": 0.975}
     halign: "center"
     theme_font_name: "Custom"
     font_name: "robotvar.ttf"
-           
+
+# How topics in a database are displayed     
 <SubjectFrame>:
     orientation: 'vertical'
     size_hint: 1, None
@@ -212,9 +218,59 @@ KV = """
         adaptive_height: True
         padding: dp(10)
         spacing: dp(5)
+        
+# The layout for each bee in the inventory (I think index may have a different layout)
+<BeeInInventoryFrame>:
+    orientation: 'vertical'
+    size_hint_y: None
+    size: "300dp", "150dp"
+    padding: "16dp"
+    spacing: "12dp"
+    radius: 24
+    md_bg_color: app.theme_cls.primaryContainerColor
+    
+    MDFloatLayout:
+        orientation: "vertical"
+        size_hint: None, None
+        size: self.parent.size
+        spacing: "4dp"
+
+        # Container for the bee image (Lighter box)
+        MDBoxLayout:
+            size_hint: None, None
+            size: "120dp", "120dp"
+            pos_hint: {"center_x": 0.1, "center_y": 0.4}
+            radius: 16
+            md_bg_color: app.theme_cls.secondaryContainerColor
+            # Add Image here later
+
+
+        # The name of the bee
+        MDLabel:
+            text: root.name
+            pos_hint: {"center_x": 0.95, "center_y": 0.65}
+            #halign: "center"
+            theme_font_name: "Custom"
+            font_name: "robotvar.ttf"
+            font_style: "Headline"
+            role: "large"
+
+        # The cost of the bee
+        MDLabel:
+            text: f"{root.rarity} | Count: {root.count}"
+            pos_hint: {"center_x": 0.95,"center_y": 0.25}
+            #halign: "center"
+            theme_font_name: "Custom"
+            font_name: "robotvar.ttf"
+            theme_text_color: "Secondary"
+            font_style: "Title"
+            role: "large"
+
+# The main KV Layout
 
 MDBoxLayout:
 
+    # The side bar
     MDNavigationRail:
         type: "unselected" # Never shows the label (only way that I can get larger padding :( )
         spacing: "8dp"
@@ -252,6 +308,7 @@ MDBoxLayout:
             text: "Settings"
             screen_name: "settings"
 
+    # How each screen is managed, including transitions and the reflective changes on the side bar
     MDScreenManager:
         id: screen_manager
         current: ""
@@ -415,12 +472,43 @@ MDBoxLayout:
         # The inventory
         MDScreen:
             name: "inventory"
-            MDBoxLayout:
-                MDLabel:
-                    text: "Inventory"
-                    halign: "center"
-                    theme_font_name: "Custom"
-                    font_name: "robotvar.ttf"
+            MDScrollView:
+                scroll_type: ['bars', 'content']
+                bar_color: app.theme_cls.secondaryColor        
+                bar_color_inactive: app.theme_cls.secondaryColor
+                size_hint: 0.9, 0.9
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                do_scroll_x: False
+                do_scroll_y: True
+                bar_width: dp(4)
+                padding: dp(10)
+                width: root.width * 0.85
+                height: root.height * 0.85
+
+                MDBoxLayout:
+                    id: inventory_list
+                    md_bg_color: app.theme_cls.primaryColor
+                    radius: 20
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: dp(15)
+                    padding: dp(15)
+                    
+                    # These are just placeholders, will alter in the final iteration
+                    BeeInInventoryFrame
+                    BeeInInventoryFrame
+                    BeeInInventoryFrame
+                    BeeInInventoryFrame
+                    BeeInInventoryFrame
+                
+                
+            MDLabel:
+                text: "Inventory"
+                halign: "center"
+                pos_hint: {"center_y": 0.975}
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
         
         # The index         
         MDScreen:
@@ -467,6 +555,11 @@ class TaskItem(MDBoxLayout):
 class CurrencyView(MDLabel):
     pass
 
+class BeeInInventoryFrame(MDBoxLayout):
+    # Populated with placeholder data for now
+    name = StringProperty("Unknown Bee") 
+    rarity = StringProperty("Common")
+    count = NumericProperty(1)
 
 class SubjectFrame(MDBoxLayout):
     text = StringProperty() # Display name
@@ -564,10 +657,13 @@ class MainScreen(MDApp):
         if last_refresh != today_str or task_count == 0:
             cursor.execute("DELETE FROM daily_tasks")
             databases = glob.glob("*.db")
-            if self.daily_tasks_db_name in databases:
-                databases.remove(self.daily_tasks_db_name)
-            if "currency.db" in databases:
-                databases.remove("currency.db")
+            excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db"]
+            # Filters out the non subject related databases
+            filtered_databases = []
+            for db in databases:
+                if db not in excluded:
+                    filtered_databases.append(db)
+            databases = filtered_databases
 
             for db_name in databases:
                 tasks = spaced_repetition_recommendations(db_name)
@@ -599,7 +695,7 @@ class MainScreen(MDApp):
         conn = sqlite3.connect(self.daily_tasks_db_name)
         cursor = conn.cursor()
 
-        # Delete the task from the daily_tasks database
+        # Delete the completed task from the daily_tasks database
         cursor.execute("DELETE FROM daily_tasks WHERE topic_id = ? AND db_name = ?", (task_item.topic_id, task_item.db_name))
         conn.commit()
         conn.close()
@@ -634,10 +730,13 @@ class MainScreen(MDApp):
         self.update_balance()
         # Creates the database list for the editor
         databases = glob.glob("*.db")
-        if self.daily_tasks_db_name in databases: # Ensures that the daily tasks database does not appear in the list
-            databases.remove(self.daily_tasks_db_name)
-        if "currency.db" in databases: # Ensures that the currency database does not appear in the list
-            databases.remove("currency.db")
+        excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db"]
+        # Filters out the non subject related databases       
+        filtered_databases = []
+        for db in databases:
+            if db not in excluded:
+                filtered_databases.append(db)
+        databases = filtered_databases
 
         for db in databases:
             item = DBItem(text=db)
