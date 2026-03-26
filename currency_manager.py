@@ -1,5 +1,4 @@
 import sqlite3
-import random
 from datetime import date
 
 def create_honeycomb_currency_db():

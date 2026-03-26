@@ -31,6 +31,7 @@ import sys # Used to get the absolute path of the Python interpreter
 # Libraries for the task screen
 import sqlite3 # I will need to create another database for the daily tasks (will need to find a way to prevent it appearing in the program)
 from datetime import date # Checks the age of the task
+import db_helper # Helper for updating grades
 from spaced_repetition_planner import spaced_repetition_recommendations # My module for the spaced repetition planner
 from currency_manager import * # My module for the currency system
 
@@ -117,6 +118,7 @@ KV = """
 
 <TaskItem>:
     orientation: "horizontal"
+    size_hint_y: None
     adaptive_height: True
     spacing: "10dp"
     padding: "5dp"
@@ -128,18 +130,58 @@ KV = """
         theme_font_name: "Custom"
         font_name: "robotvar.ttf"
 
-    MDButton:
-        theme_bg_color: "Custom"
-        md_bg_color: app.theme_cls.tertiaryColor
-        style: "tonal"
+    MDBoxLayout:
+        adaptive_size: True
+        spacing: "4dp"
         pos_hint: {"center_y": .5}
-        on_release: root.mark_complete()
-        
-        MDButtonIcon:
-            theme_icon_color: "Custom"
-            icon_color: app.theme_cls.surfaceColor
-            pos_hint: {"center_x": 0.5, "center_y": 0.5}
-            icon: "flag-checkered"
+
+        MDButton:
+            style: "tonal"
+            theme_bg_color: "Custom"
+            md_bg_color: app.theme_cls.errorColor
+            on_release: root.mark_complete(1)
+            MDButtonText:
+                text: "1"
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.onErrorColor
+
+        MDButton:
+            style: "tonal"
+            theme_bg_color: "Custom"
+            md_bg_color: app.theme_cls.tertiaryContainerColor
+            on_release: root.mark_complete(2)
+            MDButtonText:
+                text: "2"
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.onTertiaryContainerColor
+
+        MDButton:
+            style: "tonal"
+            theme_bg_color: "Custom"
+            md_bg_color: app.theme_cls.secondaryContainerColor
+            on_release: root.mark_complete(3)
+            MDButtonText:
+                text: "3"
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.onSecondaryContainerColor
+
+        MDButton:
+            style: "tonal"
+            theme_bg_color: "Custom"
+            md_bg_color: app.theme_cls.primaryContainerColor
+            on_release: root.mark_complete(4)
+            MDButtonText:
+                text: "4"
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.onPrimaryContainerColor
                 
 <CurrencyView>:
     pos_hint: {"center_x": 0.85, "center_y": 0.975}
@@ -415,17 +457,20 @@ class DBItem(MDListItem, ButtonBehavior):
     
 class TaskItem(MDBoxLayout):
     text = StringProperty()
-    
-    def mark_complete(self):
+    topic_id = NumericProperty()
+    db_name = StringProperty()
+
+    def mark_complete(self, grade):
         app = MDApp.get_running_app()
-        app.handle_task_completion(self)
+        app.handle_task_completion(self, grade)
         
 class CurrencyView(MDLabel):
     pass
 
 
 class SubjectFrame(MDBoxLayout):
-    text = StringProperty()
+    text = StringProperty() # Display name
+    db_name = StringProperty() # Actual DB filename
     tasks = ListProperty()
 
     # Starts when the task_container object is created 
@@ -433,8 +478,12 @@ class SubjectFrame(MDBoxLayout):
         if not hasattr(self, 'ids') or not self.ids or not 'tasks_container' in self.ids:
             return
         self.ids.tasks_container.clear_widgets()
-        for task in self.tasks:
-            item = TaskItem(text=f"- {task}")
+        if self.tasks and len(self.tasks) > 0:
+            for task in self.tasks:
+                item = TaskItem(text=f"- {task['detail']}", topic_id=task['id'], db_name=self.db_name)
+                self.ids.tasks_container.add_widget(item)
+        else:
+            item = MDLabel(text="No tasks for today!!!", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
             self.ids.tasks_container.add_widget(item)
     
 # This defines the EggFrame
@@ -480,9 +529,11 @@ class MainScreen(MDApp):
     def setup_daily_tasks_db(self):
         conn = sqlite3.connect(self.daily_tasks_db_name)
         cursor = conn.cursor()
+        # Recreate table to ensure schema includes topic_id
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS daily_tasks (
                 db_name TEXT,
+                topic_id INTEGER,
                 task_detail TEXT
             )
         ''')
@@ -506,40 +557,50 @@ class MainScreen(MDApp):
         cursor.execute("SELECT last_refresh_date FROM refresh_log LIMIT 1")
         last_refresh = cursor.fetchone()[0]
         today_str = date.today().isoformat()
+        
+        cursor.execute("SELECT count(*) FROM daily_tasks")
+        task_count = cursor.fetchone()[0]
 
-        if last_refresh != today_str:
+        if last_refresh != today_str or task_count == 0:
             cursor.execute("DELETE FROM daily_tasks")
             databases = glob.glob("*.db")
             if self.daily_tasks_db_name in databases:
                 databases.remove(self.daily_tasks_db_name)
+            if "currency.db" in databases:
+                databases.remove("currency.db")
 
             for db_name in databases:
                 tasks = spaced_repetition_recommendations(db_name)
+                # tasks is now a list of rows (TopicID, TopicDetail)
                 for task in tasks:
-                    cursor.execute("INSERT INTO daily_tasks (db_name, task_detail) VALUES (?, ?)", (db_name, task[0]))
+                    cursor.execute("INSERT INTO daily_tasks (db_name, topic_id, task_detail) VALUES (?, ?, ?)", (db_name, task[0], task[1]))
             
             cursor.execute("UPDATE refresh_log SET last_refresh_date = ?", (today_str,))
             conn.commit()
 
-        cursor.execute("SELECT db_name, task_detail FROM daily_tasks")
+        cursor.execute("SELECT db_name, topic_id, task_detail FROM daily_tasks")
         tasks_by_db = {}
-        for db_name, task_detail in cursor.fetchall():
+        for db_name, topic_id, task_detail in cursor.fetchall():
             if db_name not in tasks_by_db:
                 tasks_by_db[db_name] = []
-            tasks_by_db[db_name].append((task_detail,))
+            tasks_by_db[db_name].append({'id': topic_id, 'detail': task_detail})
         
         conn.close()
         return tasks_by_db
     
-    def handle_task_completion(self, task_item):
-        # Remove "- " prefix to match DB entry
-        task_text = task_item.text.replace("- ", "", 1)
-        
+    def handle_task_completion(self, task_item, grade):
+        # Update the specific topic in the specific DB
+        try:
+            db_helper.update_grade(task_item.db_name, task_item.topic_id, grade)
+        except Exception as e:
+            print(f"Error updating grade: {e}")
+            return
+
         conn = sqlite3.connect(self.daily_tasks_db_name)
         cursor = conn.cursor()
 
         # Delete the task from the daily_tasks database
-        cursor.execute("DELETE FROM daily_tasks WHERE task_detail = ?", (task_text,))
+        cursor.execute("DELETE FROM daily_tasks WHERE topic_id = ? AND db_name = ?", (task_item.topic_id, task_item.db_name))
         conn.commit()
         conn.close()
         
@@ -587,9 +648,10 @@ class MainScreen(MDApp):
         # Creates the subject frames for the home screen
         tasks_by_db = self.get_daily_tasks()
         
+        
         for db in databases:
             tasks = tasks_by_db.get(db, [])
-            subject_frame = SubjectFrame(text=os.path.splitext(db)[0], tasks=[task[0] for task in tasks])
+            subject_frame = SubjectFrame(text=os.path.splitext(db)[0], db_name=db, tasks=tasks)
             self.root.ids.home_list.add_widget(subject_frame)
     
 

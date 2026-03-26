@@ -160,7 +160,7 @@ MDScreen:
                 id: indicator
                 size_hint: None, None
                 size: sp(100), sp(100)
-                pos_hint: {"center_x": 0.5, "center_y": 0.9}
+                pos_hint: {"center_x": 0.5, "center_y": 0.2}
 
             MDLabel:
                 theme_font_name: "Custom"
