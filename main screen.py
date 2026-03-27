@@ -20,6 +20,7 @@ from kivymd.uix.label import MDLabel
 from colour_palette import colourScheme # My colour palette for the GUI
 from currency_manager import * # My module for the currency system
 from inventory_manager import * # My module for the inventory management system
+import egg_demo # Example import of your egg logic module
 from index_manager import * # My module for the index management system
 
 # Libraries for the editor screen
@@ -412,23 +413,23 @@ MDBoxLayout:
 
                         EggFrame:
                             name: "Starter"
-                            cost: "1 Coin"
+                            cost: "200 Honeycombs"
                         
                         EggFrame:
                             name: "Rare"
-                            cost: "2 Coins"
+                            cost: "400 Honeycombs"
                             
                         EggFrame:
                             name: "Epic"
-                            cost: "3 Coins"
+                            cost: "800 Honeycombs"
                                        
                         EggFrame:
                             name: "Legendary"
-                            cost: "4 Coins"
+                            cost: "1600 Honeycombs"
                             
                         EggFrame:
                             name: "Mythic" 
-                            cost: "5 Coins"
+                            cost: "3200 Honeycombs"
                                 
         
         # The homepage - where the tasks are shown
@@ -495,13 +496,6 @@ MDBoxLayout:
                     spacing: dp(15)
                     padding: dp(15)
                     
-                    # These are just placeholders, will alter in the final iteration
-                    BeeInInventoryFrame
-                    BeeInInventoryFrame
-                    BeeInInventoryFrame
-                    BeeInInventoryFrame
-                    BeeInInventoryFrame
-                
                 
             MDLabel:
                 text: "Inventory"
@@ -556,15 +550,14 @@ class CurrencyView(MDLabel):
     pass
 
 class BeeInInventoryFrame(MDBoxLayout):
-    # Populated with placeholder data for now
-    name = StringProperty("Unknown Bee") 
-    rarity = StringProperty("Common")
-    count = NumericProperty(1)
+    name = StringProperty() 
+    rarity = StringProperty()
+    count = NumericProperty()
 
 class SubjectFrame(MDBoxLayout):
     text = StringProperty() # Display name
     db_name = StringProperty() # Actual DB filename
-    tasks = ListProperty()
+    tasks = ListProperty() # The task list to be displayed
 
     # Starts when the task_container object is created 
     def on_kv_post(self, base_widget):
@@ -719,12 +712,32 @@ class MainScreen(MDApp):
             "Mythic": update_honeycombs_after_mythic_egg_purchase
         }
         
+        # Map egg names to their corresponding Egg objects from egg_demo. Strings cannot be passed into open_egg (expects an object)
+        egg_object_mapping = {
+            "Starter": egg_demo.starter_egg,
+            "Rare": egg_demo.rare_egg,
+            "Epic": egg_demo.epic_egg,
+            "Legendary": egg_demo.legendary_egg,
+            "Mythic": egg_demo.mythic_egg
+        }
+                    
+        # Invokes the method for the respective egg
+        # This passes the egg name so egg_demo knows which bee to generate
+        egg_to_open = egg_object_mapping[egg_name]
+        print(egg_name)
+        egg_demo.open_egg(egg_to_open) 
+        
+        
         if egg_name in mapping: # Dictionary lookup is O(1)
             mapping[egg_name]() # Calls the specific function
-            self.update_balance() # Refreshes the label
 
+        self.update_balance() # Seems self explanatory but it just updates the label that shows the balance
+        
     def update_balance(self):
         self.honeycombs_balance = get_honeycombs()
+        
+    def populate_inventory(self):
+        bees = get_bees_from_inventory()
         
     def on_start(self):
         self.update_balance()

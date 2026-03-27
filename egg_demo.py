@@ -1,6 +1,7 @@
 # Libraries
 import random
 import math
+from inventory_manager import *
 
 # Class for the Bee
 class Bee:
@@ -42,7 +43,7 @@ class Egg:
 def open_egg(egg, tolerance=1e-9): 
     total = egg.total_probability()
     if not math.isclose(total, 1.0, abs_tol=tolerance):
-        raise ValueError(f"Probabilities must sum to 1, instead got {total}")
+        raise ValueError(f"Probabilities must sum to 1, instead got {total}") # Ensures that the sum of probabilities is always 1 otherwise the logic goes awry
     
     # This is where the weighted selection takes place
     # random_number is used to determine the critical region of the egg, the rarer the bee, the closer to the tails they are
@@ -52,6 +53,10 @@ def open_egg(egg, tolerance=1e-9):
     for bee, probability in egg.bees.items():
         cumulative += probability
         if random_number < cumulative:
+            # Adds the bee to the inventory
+            add_bee_to_inventory(bee)
+            # Purely for debugging purposes
+            print(f"You hatched: {bee.name}")
             return bee
 
 # Defining the bees
@@ -66,6 +71,7 @@ lion_bee = Bee(8, "Lion Bee", "Legendary")
 spicy_bee = Bee(9, "Spicy Bee", "Mythic")
 
 # Defining the Eggs and the Bees in the eggs as well as their probabilities
+# Not sure if I want to change the names of the bees (to avoid the fact that it seems too similar to BSS)
 starter_egg = Egg("Starter Egg", 1)
 starter_egg.add_item(basic_bee, 0.9)
 starter_egg.add_item(bumble_bee, 0.05)
@@ -92,63 +98,3 @@ legendary_egg.add_item(spicy_bee, 0.1)
 
 mythic_egg = Egg("Mythic Egg", 5)
 mythic_egg.add_item(spicy_bee, 1)
-
-# Test inventory system - will rework it to SQL Database to store it persistently
-
-inventory = {}
-
-def add_to_inventory(item):
-    # Stores the beees by their names instead of objects so the inventory can be stored in plaintext rather than storing it in SQLite as objects,
-    # as SQLite does not support storing it as objects (Reference: https://stackoverflow.com/questions/2047814/is-it-possible-to-store-python-class-objects-in-sqlite)
-    bee_name = item.name if hasattr(item, 'name') else item # bee_name just extracts the value of the attribute 'name' so that I can achieve what I want to do in the comments above
-    inventory[bee_name] = inventory.get(bee_name, 0) + 1
-    
-# This section is testing only, it will be removed in the final iteration as the GUI will invoke these functions
-balance = 100
-while True:
-    print(f"Balance = {balance}")
-    selector = int(input("""Select which egg to buy:
-                         1. Starter Egg
-                         2. Rare Egg
-                         3. Epic Egg
-                         4. Legendary Egg
-                         5. Mythic Egg
-                         6. Quit program"""))
-    # Will add validation later
-    # The variable 'success' is a flag that only buys the egg if it is 'True'
-    if selector == 1:
-        success, msg, balance = starter_egg.buy(balance)
-        print(msg)
-        if success:
-            bee = open_egg(starter_egg)
-            print(f"You hatched: {bee.name}")
-            add_to_inventory(bee)
-    elif selector == 2:
-        success, msg, balance = rare_egg.buy(balance)
-        print(msg)
-        if success:
-            bee = open_egg(rare_egg)
-            print(f"You hatched: {bee.name}")
-            add_to_inventory(bee)
-    elif selector == 3:
-        success, msg, balance = epic_egg.buy(balance)
-        print(msg)
-        if success:
-            bee = open_egg(epic_egg)
-            print(f"You hatched: {bee.name}")
-            add_to_inventory(bee)
-    elif selector == 4:
-        success, msg, balance = legendary_egg.buy(balance)
-        print(msg)
-        if success:
-            bee = open_egg(legendary_egg)
-            print(f"You hatched: {bee.name}")
-            add_to_inventory(bee)
-    elif selector == 5:
-        success, msg, balance = mythic_egg.buy(balance)
-        print(msg)
-        if success:
-            bee = open_egg(mythic_egg)
-            print(f"You hatched: {bee.name}")
-            add_to_inventory(bee)
-            

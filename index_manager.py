@@ -36,7 +36,7 @@ def create_index():
 def build_index():
     conn = sqlite3.connect("index.db")
     cursor = conn.cursor()
-    for bee in range(1,len(bees)):
+    for bee in range(len(bees)):
         bee = list(bees.keys())[bee]
         values = [(bee, bees[bee]["rarity"], str(False))]
         cursor.executemany("INSERT INTO beeIndex (beeName, beeRarity, discovered) VALUES (?, ?, ?)", values)
@@ -52,7 +52,7 @@ def discover_bee(bee):
     conn.close()
 
 # Returns the list of bees - useful for the Index page in the main screen as I will separate them from discovered and undiscovered
-def get_bees():
+def get_bees_from_index():
     conn = sqlite3.connect("index.db")
     cursor = conn.cursor()
     cursor.execute("SELECT beeName FROM beeIndex")

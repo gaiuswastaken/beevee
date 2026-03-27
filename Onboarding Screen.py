@@ -19,6 +19,8 @@ import requests # Validation of the Gemini API key
 import os # Deletes redundant database files (if it failed so that Gemini can regenerate it without SQLite operation issues)
 from colour_palette import colourScheme # My colour palette for the GUI
 from currency_manager import create_honeycomb_currency_db
+from inventory_manager import create_inventory
+from index_manager import create_index, build_index
 
 
 KV = """
@@ -216,8 +218,12 @@ class OnboardingScreen(MDApp):
         return Builder.load_string(KV)
 
     def on_start(self):
-        # Track which subject we're on (1..4)
+        # Builds the necessary non-subject databases
         create_honeycomb_currency_db()
+        create_inventory()
+        create_index()
+        build_index()
+        # Track which subject we're on (1..4)
         self.subject_index = 1
         self._update_subject_title()
 

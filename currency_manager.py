@@ -9,7 +9,10 @@ def create_honeycomb_currency_db():
                 honeycombs INTEGER
             )
         ''')
-    cursor.execute('''INSERT INTO currency (honeycombs) VALUES (?)''', (0,))
+    # A failsafe to ensure that the currency is only created if it doesn't already exist
+    cursor.execute("SELECT count(*) FROM currency")
+    if cursor.fetchone()[0] == 0:
+        cursor.execute('''INSERT INTO currency (honeycombs) VALUES (?)''', (0,))
     conn.commit()
     conn.close()
     
@@ -28,35 +31,35 @@ def update_honeycombs_after_task_completion(amount=20):
     conn.commit()
     conn.close()
 
-def update_honeycombs_after_starter_egg_purchase(amount=10):
+def update_honeycombs_after_starter_egg_purchase(amount=200):
     conn = sqlite3.connect("currency.db")
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()
     conn.close()
 
-def update_honeycombs_after_rare_egg_purchase(amount=20):
+def update_honeycombs_after_rare_egg_purchase(amount=400):
     conn = sqlite3.connect("currency.db")
     cursor = conn.cursor()  
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()
     conn.close()
     
-def update_honeycombs_after_epic_egg_purchase(amount=30):
+def update_honeycombs_after_epic_egg_purchase(amount=800):
     conn = sqlite3.connect("currency.db")
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()
     conn.close()
 
-def update_honeycombs_after_legendary_egg_purchase(amount=40):
+def update_honeycombs_after_legendary_egg_purchase(amount=1600):
     conn = sqlite3.connect("currency.db")
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()
     conn.close()
 
-def update_honeycombs_after_mythic_egg_purchase(amount=50):
+def update_honeycombs_after_mythic_egg_purchase(amount=3200):
     conn = sqlite3.connect("currency.db")
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
