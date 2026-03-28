@@ -266,6 +266,53 @@ KV = """
             theme_text_color: "Secondary"
             font_style: "Title"
             role: "large"
+            
+# The layout for each bee in the index (Index shares some similaritiies to inventory)
+<BeeInIndexFrame>:
+    orientation: 'vertical'
+    size_hint_y: None
+    size: "300dp", "150dp"
+    padding: "16dp"
+    spacing: "12dp"
+    radius: 24
+    md_bg_color: app.theme_cls.primaryContainerColor
+    
+    MDFloatLayout:
+        orientation: "vertical"
+        size_hint: None, None
+        size: self.parent.size
+        spacing: "4dp"
+
+        # Container for the bee image (Lighter box)
+        MDBoxLayout:
+            size_hint: None, None
+            size: "120dp", "120dp"
+            pos_hint: {"center_x": 0.1, "center_y": 0.4}
+            radius: 16
+            md_bg_color: app.theme_cls.secondaryContainerColor
+            # Add Image here later
+
+
+        # The name of the bee
+        MDLabel:
+            text: root.name
+            pos_hint: {"center_x": 0.95, "center_y": 0.65}
+            #halign: "center"
+            theme_font_name: "Custom"
+            font_name: "robotvar.ttf"
+            font_style: "Headline"
+            role: "large"
+
+        # The rarity of the bee and whether it was discovered
+        MDLabel:
+            text: f"{root.rarity} | Discovered: {root.discovered}"
+            pos_hint: {"center_x": 0.95,"center_y": 0.25}
+            #halign: "center"
+            theme_font_name: "Custom"
+            font_name: "robotvar.ttf"
+            theme_text_color: "Secondary"
+            font_style: "Title"
+            role: "large"
 
 # The main KV Layout
 
@@ -507,12 +554,36 @@ MDBoxLayout:
         # The index         
         MDScreen:
             name: "index"
-            MDBoxLayout:
-                MDLabel:
-                    text: "Index"
-                    halign: "center"
-                    theme_font_name: "Custom"
-                    font_name: "robotvar.ttf"
+            MDScrollView:
+                scroll_type: ['bars', 'content']
+                bar_color: app.theme_cls.secondaryColor        
+                bar_color_inactive: app.theme_cls.secondaryColor
+                size_hint: 0.9, 0.9
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                do_scroll_x: False
+                do_scroll_y: True
+                bar_width: dp(4)
+                padding: dp(10)
+                width: root.width * 0.85
+                height: root.height * 0.85
+
+                MDBoxLayout:
+                    id: index_list
+                    md_bg_color: app.theme_cls.primaryColor
+                    radius: 20
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: dp(15)
+                    padding: dp(15)
+                    
+                
+            MDLabel:
+                text: "Index"
+                halign: "center"
+                pos_hint: {"center_y": 0.975}
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
         
         # The settings page (implement last as minor)            
         MDScreen:
@@ -523,6 +594,26 @@ MDBoxLayout:
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
+                
+                MDScrollView:
+                    scroll_type: ['bars', 'content']
+                    bar_color: app.theme_cls.secondaryColor        
+                    bar_color_inactive: app.theme_cls.secondaryColor
+                    size_hint: 0.9, 0.9
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    bar_width: dp(4)
+                    padding: dp(10)
+                    width: root.width * 0.85
+                    height: root.height * 0.85
+                    
+                    # Dark mode switch
+                    MDSwitch:
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                        theme_font_name: "Custom"
+                        font_name: "robotvar.ttf"
+                        #on_active: app.toggle_dark_mode()
         
 """
 
@@ -553,6 +644,11 @@ class BeeInInventoryFrame(MDBoxLayout):
     name = StringProperty() 
     rarity = StringProperty()
     count = NumericProperty()
+    
+class BeeInIndexFrame(MDBoxLayout):
+    name = StringProperty() 
+    rarity = StringProperty()
+    discovered = StringProperty() # Booleans cannot be displayed nor stored in sqlite so they would have to be converted to strings
 
 class SubjectFrame(MDBoxLayout):
     text = StringProperty() # Display name
@@ -733,11 +829,45 @@ class MainScreen(MDApp):
 
         self.update_balance() # Seems self explanatory but it just updates the label that shows the balance
         
+        self.populate_inventory() # Updates the inventory after an egg is bought
+        self.populate_index() # Updates the index after an egg is bought (slightly inefficient to do this every time an egg is opened as it may not always be the case that a bee has been discovered after opening an egg)
+        
+        
+        
     def update_balance(self):
         self.honeycombs_balance = get_honeycombs()
         
     def populate_inventory(self):
+        # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
+        self.root.ids.inventory_list.clear_widgets()
         bees = get_bees_from_inventory()
+        if not bees:
+            self.root.ids.inventory_list.add_widget(
+                MDLabel(text="You have no bees in your inventory...Get some tasks done to hatch eggs!!!", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
+            )
+            return
+        
+        for name, rarity, count in bees:
+            bee_frame = BeeInInventoryFrame(name=name, rarity=rarity, count=count)
+            self.root.ids.inventory_list.add_widget(bee_frame)
+            
+    def populate_index(self):
+        # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
+        self.root.ids.index_list.clear_widgets()
+        bees = get_bees_from_index()
+        if not bees:
+            self.root.ids.inventory_list.add_widget(
+                MDLabel(text="You may need to run the onboarding screen", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
+            )
+            return
+        
+        for name, rarity, discovered in bees:
+            if discovered == str(True):
+                display_discovered = "Yes"
+            else:
+                display_discovered = "No"
+            bee_frame = BeeInIndexFrame(name=name, rarity=rarity, discovered=display_discovered)
+            self.root.ids.index_list.add_widget(bee_frame)
         
     def on_start(self):
         self.update_balance()
@@ -765,6 +895,11 @@ class MainScreen(MDApp):
             tasks = tasks_by_db.get(db, [])
             subject_frame = SubjectFrame(text=os.path.splitext(db)[0], db_name=db, tasks=tasks)
             self.root.ids.home_list.add_widget(subject_frame)
+            
+        # Populates the inventory when the app starts
+        self.populate_inventory()
+        # Populates index when app starts
+        self.populate_index()
     
 
 MainScreen().run()

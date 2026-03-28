@@ -58,7 +58,7 @@ def add_bee_to_inventory(bee):
 def get_bees_from_inventory():
     conn = sqlite3.connect("inventory.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT beeName FROM inventory")
+    cursor.execute("SELECT beeName, beeRarity, count FROM inventory")
     available_bees = cursor.fetchall()
     conn.close()
     return available_bees

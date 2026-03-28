@@ -55,7 +55,7 @@ def discover_bee(bee):
 def get_bees_from_index():
     conn = sqlite3.connect("index.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT beeName FROM beeIndex")
+    cursor.execute("SELECT beeName, beeRarity, discovered FROM beeIndex")
     available_bees = cursor.fetchall()
     conn.close()
     return available_bees
