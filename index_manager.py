@@ -39,7 +39,8 @@ def build_index():
     for bee in range(len(bees)):
         bee = list(bees.keys())[bee]
         values = [(bee, bees[bee]["rarity"], str(False))]
-        cursor.executemany("INSERT INTO beeIndex (beeName, beeRarity, discovered) VALUES (?, ?, ?)", values)
+        # The IGNORE part is yet again another failsafe to prevent crashes should the onboarding screen be run more than once
+        cursor.executemany("INSERT OR IGNORE INTO beeIndex (beeName, beeRarity, discovered) VALUES (?, ?, ?)", values)
     conn.commit()
     conn.close()
 

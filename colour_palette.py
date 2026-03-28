@@ -1,43 +1,45 @@
 from kivy.utils import get_color_from_hex
 
-colourScheme = {
+light_colourScheme = {
+    "primary": "#725C0C",
+    "onPrimary": "#FFFFFF",
+    "primaryContainer": "#FFE086",
+    "onPrimaryContainer": "#574500",
+    "secondary": "#685E3F",
+    "onSecondary": "#FFFFFF",
+    "secondaryContainer": "#F1E1BB",
+    "onSecondaryContainer": "#50462A",
+    "tertiary": "#46664B",
+    "onTertiary": "#FFFFFF",
+    "tertiaryContainer": "#C8ECCA",
+    "onTertiaryContainer": "#2F4E35",
+    "background": "#FFF8F0",
+    "onBackground": "#1E1B13",
+    "surface": "#FFF8F0",
+    "onSurface": "#1E1B13",
+    "surfaceVariant": "#EBE2CF",
+    "onSurfaceVariant": "#4C4639",
+    "outline": "#7D7667",
+}
 
-    # The main colours (honey) 
-    "primary": get_color_from_hex("#C89B00"),  
-    "onPrimary": get_color_from_hex("#FFFFFF"),
-
-    "primaryContainer": get_color_from_hex("#F2E3A3"),  
-    "onPrimaryContainer": get_color_from_hex("#3A2F00"),
-
-    # Supporting accent (wood / hive tone) 
-    "secondary": get_color_from_hex("#7A5A2B"),
-    "onSecondary": get_color_from_hex("#FFFFFF"),
-
-    "secondaryContainer": get_color_from_hex("#E6D5B5"),
-    "onSecondaryContainer": get_color_from_hex("#2A1E0C"),
-
-    # Natural accent (plant / pollen hint) 
-    "tertiary": get_color_from_hex("#556B2F"),
-    "onTertiary": get_color_from_hex("#FFFFFF"),
-
-    "tertiaryContainer": get_color_from_hex("#D5E2B3"),
-    "onTertiaryContainer": get_color_from_hex("#1F2A0B"),
-
-    # Background surfaces 
-    "background": get_color_from_hex("#FAF7F0"),
-    "onBackground": get_color_from_hex("#1C1B1F"),
-
-    "surface": get_color_from_hex("#FAF7F0"),
-    "onSurface": get_color_from_hex("#1C1B1F"),
-
-    "surfaceVariant": get_color_from_hex("#E7E1D6"),
-    "onSurfaceVariant": get_color_from_hex("#49454F"),
-
-    # Utility 
-    "outline": get_color_from_hex("#8F8A82"),
-
-    "error": get_color_from_hex("#B3261E"),
-    "onError": get_color_from_hex("#FFFFFF"),
-    "errorContainer": get_color_from_hex("#F9DEDC"),
-    "onErrorContainer": get_color_from_hex("#410E0B"),
+dark_colourScheme = {
+    "primary": "#E1C46D",
+    "onPrimary": "#3C2F00",
+    "primaryContainer": "#574500",
+    "onPrimaryContainer": "#FFE086",
+    "secondary": "#D4C5A1",
+    "onSecondary": "#383016",
+    "secondaryContainer": "#50462A",
+    "onSecondaryContainer": "#F1E1BB",
+    "tertiary": "#ACCFAF",
+    "onTertiary": "#183720",
+    "tertiaryContainer": "#2F4E35",
+    "onTertiaryContainer": "#C8ECCA",
+    "background": "#16130B",
+    "onBackground": "#EAE2D4",
+    "surface": "#16130B",
+    "onSurface": "#EAE2D4",
+    "surfaceVariant": "#4C4639",
+    "onSurfaceVariant": "#CEC6B4",
+    "outline": "#979080",
 }

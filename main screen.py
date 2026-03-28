@@ -10,18 +10,19 @@ Config.set("graphics", "resizable", "0")
 # General Libraries
 from kivy.lang import Builder # Builds the KV statement
 from kivymd.app import MDApp # How to actually run the code
-from kivy.properties import StringProperty # For properties that are strings such as MDNavigationRailItemIcoon
+from kivy.properties import StringProperty # Kivy has an easier way to set th datatypes of properties than stock python
 from kivy.properties import ListProperty, NumericProperty # Same with lists. 
 from kivymd.uix.navigationrail import MDNavigationRailItem
 from kivymd.uix.list import MDListItem
 from kivy.uix.behaviors import ButtonBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
-from colour_palette import colourScheme # My colour palette for the GUI
+from colour_palette import * # My colour palette for the GUI
 from currency_manager import * # My module for the currency system
 from inventory_manager import * # My module for the inventory management system
 import egg_demo # Example import of your egg logic module
 from index_manager import * # My module for the index management system
+from kivy.clock import Clock # This allows functions to be scheduled, useful for time sensitive GUI-invoked functions
 
 # Libraries for the editor screen
 import os # For accessing the databases
@@ -30,7 +31,8 @@ from fsrs_db_editor import editor_main # My database editor
 import subprocess # How I can open my editor in a separate window
 import sys # Used to get the absolute path of the Python interpreter
 
-# Libraries for the shop screen
+# Libraries for the settings screen
+from config_manager import get_setting, enable_setting, disable_setting
 
 # Libraries for the task screen
 import sqlite3 # I will need to create another database for the daily tasks (will need to find a way to prevent it appearing in the program)
@@ -86,7 +88,7 @@ KV = """
             height: 0.4 * self.parent.parent.height
             pos_hint: {"center_x": 0.5,"center_y": 0.75}
             radius: 20
-            md_bg_color: app.theme_cls.secondaryContainerColor
+            md_bg_color: app.theme_cls.onPrimaryContainerColor
             
         MDLabel:
             id: name
@@ -321,9 +323,10 @@ MDBoxLayout:
     # The side bar
     MDNavigationRail:
         type: "unselected" # Never shows the label (only way that I can get larger padding :( )
+        theme_bg_color: "Custom"
         spacing: "8dp"
         padding: "8dp"
-        md_bg_color: app.theme_cls.primaryContainerColor
+        md_bg_color: app.nav_bg_color
 
         NavItem:
             icon: "text-box-edit"
@@ -588,14 +591,15 @@ MDBoxLayout:
         # The settings page (implement last as minor)            
         MDScreen:
             name: "settings"
-            MDBoxLayout:
+            MDFloatLayout:
                 MDLabel:
                     text: "Settings"
+                    pos_hint: {"center_y": 0.975}
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
                 
-                MDScrollView:
+                MDScrollView: # Future proofing it (if I want to add more settings in the future)
                     scroll_type: ['bars', 'content']
                     bar_color: app.theme_cls.secondaryColor        
                     bar_color_inactive: app.theme_cls.secondaryColor
@@ -606,15 +610,42 @@ MDBoxLayout:
                     bar_width: dp(4)
                     padding: dp(10)
                     width: root.width * 0.85
-                    height: root.height * 0.85
+                    adaptive_height: True
+                    #height: root.height * 0.85
                     
-                    # Dark mode switch
-                    MDSwitch:
-                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
-                        theme_font_name: "Custom"
-                        font_name: "robotvar.ttf"
-                        #on_active: app.toggle_dark_mode()
-        
+                    MDAnchorLayout:
+                        anchor_x: "center"
+                        anchor_y: "top"
+                        
+                        MDBoxLayout:
+                            id: settings_list
+                            orientation: "vertical"
+                            adaptive_height: True
+                            spacing: dp(20)
+                            padding: dp(10)
+                            
+                            
+                            # Dark mode switch
+                            MDBoxLayout:
+                                orientation: "horizontal"
+                                md_bg_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: None
+                                height: dp(50)
+                                padding: dp(10)
+                                radius: dp(10)
+                                spacing: dp(10)
+                                
+                                MDLabel:
+                                    text: "Dark Mode"
+                                    halign: "left"
+                                    theme_font_name: "Custom"
+                                    font_name: "robotvar.ttf"
+                                    
+                                
+                                MDSwitch:
+                                    id: dark_mode_switch
+                                    pos_hint: {"center_y": 0.5}
+                                    on_active: app.toggle_dark_mode()
 """
 
 
@@ -676,23 +707,59 @@ class EggFrame(MDBoxLayout):
 class MainScreen(MDApp):
     daily_tasks_db_name = "daily_tasks.db"
     honeycombs_balance = NumericProperty(0)
+    nav_bg_color = ListProperty()
 
     def build(self):
         # Defines theme colours (adds a lot of lines :O )
-        self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
-        # Saves time from me writing self.theme_cls like 20 times
-        theme = self.theme_cls
-        
-        for key, value in colourScheme.items():
-            attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention. Learn more about it here: https://m3.material.io/
-            if hasattr(theme, attr):
-                setattr(theme, attr, value)
+
+        Clock.schedule_once(self.theme_colour_on_launch) # 'ids' in KivyMD are not created until the whole GUI is created hence it needs to be scheduled
+            
+        self.apply_custom_theme()
+        # This is the only way to make the sidebar change colours on toggling it
+        self.nav_bg_color = self.theme_cls.primaryContainerColor
         
         # theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
         root = Builder.load_string(KV)
         self.process = None # Flag for checking if DBEditor is open
         return root
     
+    def apply_custom_theme(self):
+        # Re-applies the custom palette. KivyMD resets these when theme_style changes.
+        theme = self.theme_cls
+        
+        # Choose scheme based on theme style. KivyMD does not automatically handle light and dark mode for custom colour schemes
+        scheme = (
+            light_colourScheme
+            if theme.theme_style == "Light"
+            else dark_colourScheme
+        )
+        
+        for key, value in scheme.items():
+            attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
+            if hasattr(theme, attr):
+                setattr(theme, attr, value)
+        
+        self.nav_bg_color = self.theme_cls.primaryContainerColor
+
+    def theme_colour_on_launch(self,deltatime): # deltatime is the time between the dark mode logic being scheduled and executed
+        val_of_dark_mode = get_setting("Dark Mode")
+        print(val_of_dark_mode)
+        if val_of_dark_mode == [('False',)]:
+            self.root.ids.dark_mode_switch.active = False
+            self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
+        else:
+            self.root.ids.dark_mode_switch.active = True
+            self.theme_cls.theme_style = "Dark"
+
+    def toggle_dark_mode(self):
+        if self.theme_cls.theme_style == "Light":
+            enable_setting("Dark Mode")
+            self.theme_cls.theme_style = "Dark"
+        else:
+            disable_setting("Dark Mode")
+            self.theme_cls.theme_style = "Light"
+        self.apply_custom_theme()        
+
     def openDB(self, text):
         print(f"Opening database: {text}")
         # Starts the editor in a separate process so the current window stays open
@@ -873,7 +940,7 @@ class MainScreen(MDApp):
         self.update_balance()
         # Creates the database list for the editor
         databases = glob.glob("*.db")
-        excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db"]
+        excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db", "config.db"]
         # Filters out the non subject related databases       
         filtered_databases = []
         for db in databases:

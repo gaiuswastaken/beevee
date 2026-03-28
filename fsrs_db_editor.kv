@@ -1,7 +1,7 @@
 #:kivy 2.3.1
 
 MDScreen:
-    md_bg_color: 1,1,1,1
+    md_bg_color: app.theme_cls.backgroundColor
     MDBoxLayout:
         orientation: "vertical"
         MDBoxLayout:
@@ -12,18 +12,26 @@ MDScreen:
             MDLabel:
                 text: "DB Editor"
                 halign: "left"
+                theme_font_name: "Custom"
+                font_name: "robotvar.ttf"
             MDBoxLayout:
                 size_hint_x: None
                 width: "220dp"
                 spacing: "8dp"
                 MDButton:
                     style: "elevated"
-                    text: "Open DB"
                     on_release: app.open_file_picker()
+                    MDButtonText:
+                        text: "Open DB"
+                        theme_font_name: "Custom"
+                        font_name: "robotvar.ttf"
                 MDButton:
-                    text: "Refresh"
                     style: "elevated"
                     on_release: app.load_topics()
+                    MDButtonText:
+                        text: "Refresh"
+                        theme_font_name: "Custom"
+                        font_name: "robotvar.ttf"
 
         # Header row (table-like)
         GridLayout:
@@ -34,7 +42,7 @@ MDScreen:
             spacing: '4dp'
             canvas.before:
                 Color:
-                    rgba: .95, .95, .95, 1
+                    rgba: app.theme_cls.surfaceVariantColor
                 Rectangle:
                     pos: self.pos
                     size: self.size

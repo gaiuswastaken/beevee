@@ -23,7 +23,8 @@ from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogSupporting
 from kivymd.uix.button import MDButton, MDButtonText
 import db_helper # Has a function that allows the data to be extracted from the SQL database without the need to converge SQL and Python in the editor
 from pathlib import Path
-from colour_palette import colourScheme
+from colour_palette import * # My colour palette for the GUI
+from config_manager import get_setting
 
 KV = """
 MDScreen:
@@ -332,15 +333,37 @@ def editor_main(database:str):
         db_file = database # Referred to using self.db_file unless inheritance is used (not necessary here)
 
         def build(self):
-            self.theme_cls.theme_style = "Light"
-            # Saves time from me writing self.theme_cls like 20 times
+            val_of_dark_mode = get_setting("Dark Mode")
+            if val_of_dark_mode == "False":
+                self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
+            else:
+                self.theme_cls.theme_style = "Dark"
+                
+                self.apply_custom_theme()
+                return Builder.load_string(KV)
+        
+        def apply_custom_theme(self):
+            # Re-applies the custom palette. KivyMD resets these when theme_style changes.
             theme = self.theme_cls
             
-            for key, value in colourScheme.items():
-                attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention. Learn more about it here: https://m3.material.io/
+            # Choose scheme based on theme style. KivyMD does not automatically handle light and dark mode for custom colour schemes
+            scheme = (
+                light_colourScheme
+                if theme.theme_style == "Light"
+                else dark_colourScheme
+            )
+            
+            for key, value in scheme.items():
+                attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
                 if hasattr(theme, attr):
                     setattr(theme, attr, value)
-            return Builder.load_string(KV)
+
+        def toggle_dark_mode(self):
+            if self.theme_cls.theme_style == "Light":
+                self.theme_cls.theme_style = "Dark"
+            else:
+                self.theme_cls.theme_style = "Light"
+            self.apply_custom_theme()
 
         def on_start(self):
             # This procedure is bound when the program starts up

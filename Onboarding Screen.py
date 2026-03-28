@@ -17,10 +17,11 @@ import webbrowser # Opens the default web browser with a link as a parameter
 import specification_creator # My module that creates the subject specification using Google Gemini
 import requests # Validation of the Gemini API key
 import os # Deletes redundant database files (if it failed so that Gemini can regenerate it without SQLite operation issues)
-from colour_palette import colourScheme # My colour palette for the GUI
+from colour_palette import * # My colour palette for the GUI
 from currency_manager import create_honeycomb_currency_db
 from inventory_manager import create_inventory
 from index_manager import create_index, build_index
+from config_manager import create_setting
 
 
 KV = """
@@ -205,17 +206,24 @@ class OnboardingScreen(MDApp):
     def build(self):
         # Make spinner and buttons render properly
         self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
-        #self.theme_cls.primary_palette = "Cyan" # The accent colour, might change this to a more 'bee-themed' colour
-        #self.theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
-        # Saves time from me writing self.theme_cls like 20 times
+        self.apply_custom_theme()
+        return Builder.load_string(KV)
+    
+    def apply_custom_theme(self):
+        # Re-applies the custom palette. KivyMD resets these when theme_style changes.
         theme = self.theme_cls
         
-        for key, value in colourScheme.items():
-            attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention. Learn more about it here: https://m3.material.io/
+        # Choose scheme based on theme style. KivyMD does not automatically handle light and dark mode for custom colour schemes
+        scheme = (
+            light_colourScheme
+            if theme.theme_style == "Light"
+            else dark_colourScheme
+        )
+        
+        for key, value in scheme.items():
+            attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
             if hasattr(theme, attr):
                 setattr(theme, attr, value)
-                
-        return Builder.load_string(KV)
 
     def on_start(self):
         # Builds the necessary non-subject databases
@@ -223,6 +231,7 @@ class OnboardingScreen(MDApp):
         create_inventory()
         create_index()
         build_index()
+        create_setting("Dark Mode")
         # Track which subject we're on (1..4)
         self.subject_index = 1
         self._update_subject_title()
