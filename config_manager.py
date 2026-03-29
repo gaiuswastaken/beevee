@@ -6,7 +6,7 @@ def create_setting(setting):
     # Also conducts a sanity check to see if there isnt a table called settings (this prevents unnecessary overwriting of data, which could lead to data loss)
     cursor.execute('''
             CREATE TABLE IF NOT EXISTS settings (
-                name TEXT,
+                name TEXT PRIMARY KEY,
                 enabled TEXT
             )
         ''')

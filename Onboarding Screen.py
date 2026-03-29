@@ -21,7 +21,7 @@ from colour_palette import * # My colour palette for the GUI
 from currency_manager import create_honeycomb_currency_db
 from inventory_manager import create_inventory
 from index_manager import create_index, build_index
-from config_manager import create_setting
+from config_manager import create_setting, enable_setting
 
 
 KV = """
@@ -232,6 +232,7 @@ class OnboardingScreen(MDApp):
         create_index()
         build_index()
         create_setting("Dark Mode")
+        create_setting("Onboarding Complete")
         # Track which subject we're on (1..4)
         self.subject_index = 1
         self._update_subject_title()
@@ -365,6 +366,7 @@ class OnboardingScreen(MDApp):
 
     def finish_onboarding(self):
         print("Onboarding complete!")
+        enable_setting("Onboarding Complete")
         # I should call it so that the main app gets launched (not yet in development)
 
 OnboardingScreen().run()

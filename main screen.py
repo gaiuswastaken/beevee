@@ -31,6 +31,9 @@ from fsrs_db_editor import editor_main # My database editor
 import subprocess # How I can open my editor in a separate window
 import sys # Used to get the absolute path of the Python interpreter
 
+# Libraries for the shop screen
+from kivymd.uix.snackbar import * # For the pop-up messages when an egg is bought
+
 # Libraries for the settings screen
 from config_manager import get_setting, enable_setting, disable_setting
 
@@ -704,7 +707,7 @@ class EggFrame(MDBoxLayout):
     name = StringProperty()
     cost = StringProperty()
     
-class MainScreen(MDApp):
+class Beevee(MDApp):
     daily_tasks_db_name = "daily_tasks.db"
     honeycombs_balance = NumericProperty(0)
     nav_bg_color = ListProperty()
@@ -813,7 +816,7 @@ class MainScreen(MDApp):
         if last_refresh != today_str or task_count == 0:
             cursor.execute("DELETE FROM daily_tasks")
             databases = glob.glob("*.db")
-            excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db"]
+            excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db", "config.db"]
             # Filters out the non subject related databases
             filtered_databases = []
             for db in databases:
@@ -888,7 +891,7 @@ class MainScreen(MDApp):
         # This passes the egg name so egg_demo knows which bee to generate
         egg_to_open = egg_object_mapping[egg_name]
         print(egg_name)
-        egg_demo.open_egg(egg_to_open) 
+        hatched_bee = egg_demo.open_egg(egg_to_open) 
         
         
         if egg_name in mapping: # Dictionary lookup is O(1)
@@ -899,6 +902,26 @@ class MainScreen(MDApp):
         self.populate_inventory() # Updates the inventory after an egg is bought
         self.populate_index() # Updates the index after an egg is bought (slightly inefficient to do this every time an egg is opened as it may not always be the case that a bee has been discovered after opening an egg)
         
+        # Adds a snackbar to show the user what they got from the egg. KivyMD does not let me make the snackbar in a KV string (implied according to the documentation, see here: https://kivymd.readthedocs.io/en/latest/components/snackbar/)
+        snackbar = MDSnackbar(
+                    MDSnackbarText(text=f"Opened a {egg_name} egg...",theme_font_name="Custom", font_name="robotvar.ttf"),
+                    MDSnackbarSupportingText(text=f"... and you hatched a {hatched_bee.name}!",theme_font_name="Custom", font_name="robotvar.ttf"),
+                    MDSnackbarButtonContainer(
+                        MDSnackbarCloseButton(
+                            icon="close",
+                        ),
+                        pos_hint={"center_y": 0.5}
+                    ),
+                    md_bg_color=self.theme_cls.primaryContainerColor,
+                    
+                    y="24dp",
+                    orientation="horizontal",
+                    pos_hint={"center_x":0.5},
+                    size_hint_x=0.5,
+        )
+        snackbar.open()
+
+
         
         
     def update_balance(self):
@@ -969,4 +992,4 @@ class MainScreen(MDApp):
         self.populate_index()
     
 
-MainScreen().run()
+Beevee().run()

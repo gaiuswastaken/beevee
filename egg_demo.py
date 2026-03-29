@@ -71,7 +71,7 @@ lion_bee = Bee(8, "Lion Bee", "Legendary")
 spicy_bee = Bee(9, "Spicy Bee", "Mythic")
 
 # Defining the Eggs and the Bees in the eggs as well as their probabilities
-# Not sure if I want to change the names of the bees (to avoid the fact that it seems too similar to BSS)
+# Hardcoding it is not really the best idea but it does prevent unwarranted tampering
 starter_egg = Egg("Starter Egg", 1)
 starter_egg.add_item(basic_bee, 0.9)
 starter_egg.add_item(bumble_bee, 0.05)

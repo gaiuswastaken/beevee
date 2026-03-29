@@ -25,6 +25,7 @@ import db_helper # Has a function that allows the data to be extracted from the 
 from pathlib import Path
 from colour_palette import * # My colour palette for the GUI
 from config_manager import get_setting
+from kivy.clock import Clock
 
 KV = """
 MDScreen:
@@ -134,17 +135,15 @@ MDScreen:
                         size_hint_y: None
                         height: sp(20)
                         pos_hint: {'center_y': .5}
-        BoxLayout:
+        MDBoxLayout:
             size_hint_y: None
             height: '36dp'
             spacing: '4dp'
             padding: 0
-            canvas.before:
-                Color:
-                    rgba: app.theme_cls.surfaceVariantColor
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+            md_bg_color: app.theme_cls.surfaceVariantColor
+            pos: self.pos
+            size: self.size
+            
             MDLabel:
                 text: "ID"
                 size_hint_x: 0.04
@@ -196,22 +195,27 @@ MDScreen:
                 size_hint_y: None
                 height: self.minimum_height
                 orientation: 'vertical'
-        BoxLayout:
+        MDBoxLayout:
             size_hint_y: None
             height: "56dp"
             padding: "8dp"
-            Button:
-                text: "Refresh"
-                font_name: "robotvar.ttf"
+            MDButton:
+                theme_width: "Custom"
+                size_hint_x: 0.9
+                style: "outlined"  
+                height: "40dp"              
                 on_release: app.load_topics()
+                
+                MDButtonText:
+                    text: "Refresh"
+                    halign: "center"
+                    theme_font_name: "Custom"
+                    font_name: "robotvar.ttf"
 
 <TopicRow>:
-    canvas.before:
-        Color:
-            rgba: root.bgcolor if hasattr(root, 'bgcolor') else (1,1,1,1)
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    md_bg_color: app.theme_cls.surfaceVariantColor if self.is_alternate else app.theme_cls.surfaceColor
+    pos: self.pos
+    size: self.size
     MDLabel:
         text: root.col0
         size_hint_x: 0.04
@@ -303,27 +307,10 @@ def editor_main(database:str):
         col7 =  StringProperty('')
         col8 = StringProperty('')
         topic_id = NumericProperty()
-        bgcolor = ListProperty([1, 1, 0, 1])
+        is_alternate = NumericProperty(0)  # 0 or 1 to determine the background colour of the row for better readability (alternating colours)
         
         def __init__(self, **kwargs):
             super().__init__(orientation='horizontal', padding=(6, 6), size_hint_y=None, height='40dp')
-            with self.canvas.before:
-                self._bg_color = Color(*self.bgcolor)
-                self._bg_rect = Rectangle(pos=self.pos, size=self.size)
-            self.bind(pos=self._update_rect, size=self._update_rect, bgcolor=self._on_bg_change)
-            
-        def _on_bg_change(self, instance, value):
-            try:
-                self._bg_color.rgba = value
-            except Exception:
-                pass    
-        
-        def _update_rect(self, *args):
-            try:
-                self._bg_rect.pos = self.pos
-                self._bg_rect.size = self.size
-            except Exception:
-                pass
         
         def on_release(self):
             MDApp.get_running_app().open_grade_dialog_by_id(self.topic_id)
@@ -331,16 +318,14 @@ def editor_main(database:str):
     class DBEditorApp(MDApp):
         dialog = None
         db_file = database # Referred to using self.db_file unless inheritance is used (not necessary here)
+        _last_theme_state = None
 
         def build(self):
-            val_of_dark_mode = get_setting("Dark Mode")
-            if val_of_dark_mode == "False":
-                self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
-            else:
-                self.theme_cls.theme_style = "Dark"
+
+            Clock.schedule_once(self.theme_colour_on_launch) # 'ids' in KivyMD are not created until the whole GUI is created hence it needs to be scheduled
                 
-                self.apply_custom_theme()
-                return Builder.load_string(KV)
+            self.apply_custom_theme()
+            return Builder.load_string(KV)
         
         def apply_custom_theme(self):
             # Re-applies the custom palette. KivyMD resets these when theme_style changes.
@@ -357,7 +342,17 @@ def editor_main(database:str):
                 attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
                 if hasattr(theme, attr):
                     setattr(theme, attr, value)
-
+                    
+        def theme_colour_on_launch(self,deltatime): # deltatime is the time between the dark mode logic being scheduled and executed
+            val_of_dark_mode = get_setting("Dark Mode")
+            print(val_of_dark_mode)
+            if val_of_dark_mode == [('False',)]:
+                self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
+            else:
+                self.theme_cls.theme_style = "Dark"
+            self.apply_custom_theme()
+            self._last_theme_state = val_of_dark_mode
+        
         def toggle_dark_mode(self):
             if self.theme_cls.theme_style == "Light":
                 self.theme_cls.theme_style = "Dark"
@@ -383,7 +378,6 @@ def editor_main(database:str):
             data = []
             # idx is simply the index in the list 'rows' and r is just the individual row
             for idx, r in enumerate(rows):
-                bgcolor = self.theme_cls.surfaceVariantColor if idx % 2 else self.theme_cls.surfaceColor
                 grade = r.get('Grade')
                 data.append(
                     {
@@ -398,7 +392,7 @@ def editor_main(database:str):
                         'col7': str(r.get('DateReviewed') or ''),
                         'col8': str(r.get('DateToReview') or ''),
                         'topic_id': r.get('TopicID'),
-                        'bgcolor': bgcolor,
+                        'is_alternate': idx % 2,
                     }
                 )
             rv.data = data        
