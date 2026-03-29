@@ -20,6 +20,10 @@ light_colourScheme = {
     "surfaceVariant": "#EBE2CF",
     "onSurfaceVariant": "#4C4639",
     "outline": "#7D7667",
+    "red": "#D32F2F",
+    "green": "#388E3C",
+    "amber": "#F57F17",
+    "customBlue": "#1976D2"
 }
 
 dark_colourScheme = {
@@ -42,4 +46,8 @@ dark_colourScheme = {
     "surfaceVariant": "#4C4639",
     "onSurfaceVariant": "#CEC6B4",
     "outline": "#979080",
+    "red": "#D32F2F",
+    "green": "#388E3C",
+    "amber": "#F57F17",
+    "customBlue": "#1976D2"
 }

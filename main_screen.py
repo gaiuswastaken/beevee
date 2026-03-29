@@ -9,9 +9,11 @@ Config.set("graphics", "resizable", "0")
 
 # General Libraries
 from kivy.lang import Builder # Builds the KV statement
+from kivy.utils import get_color_from_hex # Convert hex colors to RGBA
 from kivymd.app import MDApp # How to actually run the code
 from kivy.properties import StringProperty # Kivy has an easier way to set th datatypes of properties than stock python
 from kivy.properties import ListProperty, NumericProperty # Same with lists. 
+from kivy.properties import DictProperty # For storing custom colors 
 from kivymd.uix.navigationrail import MDNavigationRailItem
 from kivymd.uix.list import MDListItem
 from kivy.uix.behaviors import ButtonBehavior
@@ -93,6 +95,11 @@ KV = """
             radius: 20
             md_bg_color: app.theme_cls.onPrimaryContainerColor
             
+            Image:
+                source: root.image
+                fit_mode: "contain"
+                size: self.parent.size            
+            
         MDLabel:
             id: name
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
@@ -148,50 +155,50 @@ KV = """
         MDButton:
             style: "tonal"
             theme_bg_color: "Custom"
-            md_bg_color: app.theme_cls.errorColor
+            md_bg_color: app.custom_colors.get('red', app.theme_cls.primaryColor)
             on_release: root.mark_complete(1)
             MDButtonText:
                 text: "1"
                 theme_font_name: "Custom"
                 font_name: "robotvar.ttf"
                 theme_text_color: "Custom"
-                text_color: app.theme_cls.onErrorColor
+                text_color: app.theme_cls.onSurfaceColor
 
         MDButton:
             style: "tonal"
             theme_bg_color: "Custom"
-            md_bg_color: app.theme_cls.tertiaryContainerColor
+            md_bg_color: app.custom_colors.get('amber', app.theme_cls.primaryColor)
             on_release: root.mark_complete(2)
             MDButtonText:
                 text: "2"
                 theme_font_name: "Custom"
                 font_name: "robotvar.ttf"
                 theme_text_color: "Custom"
-                text_color: app.theme_cls.onTertiaryContainerColor
+                text_color: app.theme_cls.onSurfaceColor
 
         MDButton:
             style: "tonal"
             theme_bg_color: "Custom"
-            md_bg_color: app.theme_cls.secondaryContainerColor
+            md_bg_color: app.custom_colors.get('green', app.theme_cls.primaryColor)
             on_release: root.mark_complete(3)
             MDButtonText:
                 text: "3"
                 theme_font_name: "Custom"
                 font_name: "robotvar.ttf"
                 theme_text_color: "Custom"
-                text_color: app.theme_cls.onSecondaryContainerColor
+                text_color: app.theme_cls.onSurfaceColor
 
         MDButton:
             style: "tonal"
             theme_bg_color: "Custom"
-            md_bg_color: app.theme_cls.primaryContainerColor
+            md_bg_color: app.custom_colors.get('customBlue', app.theme_cls.primaryColor)
             on_release: root.mark_complete(4)
             MDButtonText:
                 text: "4"
                 theme_font_name: "Custom"
                 font_name: "robotvar.ttf"
                 theme_text_color: "Custom"
-                text_color: app.theme_cls.onPrimaryContainerColor
+                text_color: app.theme_cls.onSurfaceColor
 
 # How the users balanced is displayed              
 <CurrencyView>:
@@ -248,7 +255,10 @@ KV = """
             pos_hint: {"center_x": 0.1, "center_y": 0.4}
             radius: 16
             md_bg_color: app.theme_cls.secondaryContainerColor
-            # Add Image here later
+            Image:
+                source: root.image
+                fit_mode: "contain"
+                size: self.parent.size
 
 
         # The name of the bee
@@ -296,6 +306,10 @@ KV = """
             radius: 16
             md_bg_color: app.theme_cls.secondaryContainerColor
             # Add Image here later
+            Image:
+                source: root.image
+                fit_mode: "contain"
+                size: self.parent.size
 
 
         # The name of the bee
@@ -467,22 +481,27 @@ MDBoxLayout:
                         EggFrame:
                             name: "Starter"
                             cost: "200 Honeycombs"
+                            image: "assets/for_code/images/starter_egg.png"
                         
                         EggFrame:
                             name: "Rare"
                             cost: "400 Honeycombs"
+                            image: "assets/for_code/images/rare_egg.png"
                             
                         EggFrame:
                             name: "Epic"
                             cost: "800 Honeycombs"
+                            image: "assets/for_code/images/epic_egg.png"
                                        
                         EggFrame:
                             name: "Legendary"
                             cost: "1600 Honeycombs"
+                            image: "assets/for_code/images/legendary_egg.png"
                             
                         EggFrame:
                             name: "Mythic" 
                             cost: "3200 Honeycombs"
+                            image: "assets/for_code/images/mythic_egg.png"
                                 
         
         # The homepage - where the tasks are shown
@@ -678,11 +697,13 @@ class BeeInInventoryFrame(MDBoxLayout):
     name = StringProperty() 
     rarity = StringProperty()
     count = NumericProperty()
+    image = StringProperty() # The file path of the bee's image (for ease of access in the KV)
     
 class BeeInIndexFrame(MDBoxLayout):
     name = StringProperty() 
     rarity = StringProperty()
     discovered = StringProperty() # Booleans cannot be displayed nor stored in sqlite so they would have to be converted to strings
+    image = StringProperty() # The file path of the bee's image (for ease of access in the KV)
 
 class SubjectFrame(MDBoxLayout):
     text = StringProperty() # Display name
@@ -706,11 +727,13 @@ class SubjectFrame(MDBoxLayout):
 class EggFrame(MDBoxLayout):
     name = StringProperty()
     cost = StringProperty()
+    image = StringProperty() # The file path of the egg's image (for ease of access in the KV)
     
 class Beevee(MDApp):
     daily_tasks_db_name = "daily_tasks.db"
     honeycombs_balance = NumericProperty(0)
     nav_bg_color = ListProperty()
+    custom_colors = DictProperty({})  # Store custom colors that update with theme
 
     def build(self):
         # Defines theme colours (adds a lot of lines :O )
@@ -737,11 +760,22 @@ class Beevee(MDApp):
             else dark_colourScheme
         )
         
+        # Update both theme attributes and custom_colors dict
+        colors_dict = {}
         for key, value in scheme.items():
+            # Convert hex string to RGBA tuple that KivyMD expects
+            if isinstance(value, str) and value.startswith("#"):
+                rgba_color = get_color_from_hex(value)
+            else:
+                rgba_color = value
+                
             attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
-            if hasattr(theme, attr):
-                setattr(theme, attr, value)
+            setattr(theme, attr, rgba_color)
+            # Also store in custom_colors for KV bindings
+            colors_dict[key] = rgba_color
         
+        # Update custom_colors property to trigger KV binding updates
+        self.custom_colors = colors_dict
         self.nav_bg_color = self.theme_cls.primaryContainerColor
 
     def theme_colour_on_launch(self,deltatime): # deltatime is the time between the dark mode logic being scheduled and executed
@@ -753,6 +787,7 @@ class Beevee(MDApp):
         else:
             self.root.ids.dark_mode_switch.active = True
             self.theme_cls.theme_style = "Dark"
+        self.apply_custom_theme()
 
     def toggle_dark_mode(self):
         if self.theme_cls.theme_style == "Light":
@@ -904,15 +939,15 @@ class Beevee(MDApp):
         
         # Adds a snackbar to show the user what they got from the egg. KivyMD does not let me make the snackbar in a KV string (implied according to the documentation, see here: https://kivymd.readthedocs.io/en/latest/components/snackbar/)
         snackbar = MDSnackbar(
-                    MDSnackbarText(text=f"Opened a {egg_name} egg...",theme_font_name="Custom", font_name="robotvar.ttf"),
-                    MDSnackbarSupportingText(text=f"... and you hatched a {hatched_bee.name}!",theme_font_name="Custom", font_name="robotvar.ttf"),
+                    MDSnackbarText(text=f"Opened a {egg_name} egg...",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.primaryContainerColor),
+                    MDSnackbarSupportingText(text=f"... and you hatched a {hatched_bee.name}!",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.tertiaryContainerColor),
                     MDSnackbarButtonContainer(
                         MDSnackbarCloseButton(
-                            icon="close",
+                            icon="party-popper",
                         ),
                         pos_hint={"center_y": 0.5}
                     ),
-                    md_bg_color=self.theme_cls.primaryContainerColor,
+                    background_color=self.theme_cls.onPrimaryContainerColor,
                     
                     y="24dp",
                     orientation="horizontal",
@@ -928,6 +963,18 @@ class Beevee(MDApp):
         self.honeycombs_balance = get_honeycombs()
         
     def populate_inventory(self):
+        # Define the image paths for each bee 
+        image_mapping = {
+            "Basic Bee": "assets/for_code/images/basic_bee_128.png",
+            "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
+            "Stubborn Bee": "assets/for_code/images/easy_128.png",
+            "Bubble Bee": "assets/for_code/images/good_128.png",
+            "Rage Bee": "assets/for_code/images/again_128.png",
+            "Exhausted Bee": "assets/for_code/images/hard_128.png",
+            "Baby Bee": "assets/for_code/images/baby_bee_128.png",
+            "Lion Bee": "assets/for_code/images/lion_bee_128.png",
+            "Spicy Bee": "assets/for_code/images/spicy_bee_128.png"
+        }
         # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
         self.root.ids.inventory_list.clear_widgets()
         bees = get_bees_from_inventory()
@@ -938,10 +985,21 @@ class Beevee(MDApp):
             return
         
         for name, rarity, count in bees:
-            bee_frame = BeeInInventoryFrame(name=name, rarity=rarity, count=count)
+            bee_frame = BeeInInventoryFrame(name=name, rarity=rarity, count=count, image=image_mapping[name])
             self.root.ids.inventory_list.add_widget(bee_frame)
             
     def populate_index(self):
+        image_mapping = {
+            "Basic Bee": "assets/for_code/images/basic_bee_128.png",
+            "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
+            "Stubborn Bee": "assets/for_code/images/easy_128.png",
+            "Bubble Bee": "assets/for_code/images/good_128.png",
+            "Rage Bee": "assets/for_code/images/again_128.png",
+            "Exhausted Bee": "assets/for_code/images/hard_128.png",
+            "Baby Bee": "assets/for_code/images/baby_bee_128.png",
+            "Lion Bee": "assets/for_code/images/lion_bee_128.png",
+            "Spicy Bee": "assets/for_code/images/spicy_bee_128.png"
+        }
         # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
         self.root.ids.index_list.clear_widgets()
         bees = get_bees_from_index()
@@ -956,7 +1014,7 @@ class Beevee(MDApp):
                 display_discovered = "Yes"
             else:
                 display_discovered = "No"
-            bee_frame = BeeInIndexFrame(name=name, rarity=rarity, discovered=display_discovered)
+            bee_frame = BeeInIndexFrame(name=name, rarity=rarity, discovered=display_discovered, image=image_mapping[name])
             self.root.ids.index_list.add_widget(bee_frame)
         
     def on_start(self):

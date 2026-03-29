@@ -9,6 +9,7 @@ Config.set("graphics", "resizable", "0")
 
 # Libraries
 from kivy.lang import Builder # Builds the KV statement
+from kivy.utils import get_color_from_hex # Convert hex colors to RGBA
 from kivymd.app import MDApp # How to actually run the code
 from kivy.clock import Clock # Allows for functions to be scheduled (useful for stuff that involves networking, in this case Gemini)
 from threading import Thread # Allows for the use of threading (separate code executions, useful for running multiple things at once).
@@ -221,8 +222,9 @@ class OnboardingScreen(MDApp):
         )
         
         for key, value in scheme.items():
-            attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
-            if hasattr(theme, attr):
+            # Validate that the value is a valid hex color string
+            if isinstance(value, str) and (value.startswith("#") or value.startswith("rgba")):
+                attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
                 setattr(theme, attr, value)
 
     def on_start(self):

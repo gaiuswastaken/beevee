@@ -14,6 +14,7 @@ from kivy.properties import ListProperty # Same with lists.
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.graphics import Color, Rectangle
+from kivy.utils import get_color_from_hex # Convert hex colors to RGBA
 #from kivy.uix.filechooser import FileChooserListView
 # from kivymd.uix.dialog import MDDialogContentContainer
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -339,9 +340,14 @@ def editor_main(database:str):
             )
             
             for key, value in scheme.items():
+                # Convert hex string to RGBA tuple that KivyMD expects
+                if isinstance(value, str) and value.startswith("#"):
+                    rgba_color = get_color_from_hex(value)
+                else:
+                    rgba_color = value
+                    
                 attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
-                if hasattr(theme, attr):
-                    setattr(theme, attr, value)
+                setattr(theme, attr, rgba_color)
                     
         def theme_colour_on_launch(self,deltatime): # deltatime is the time between the dark mode logic being scheduled and executed
             val_of_dark_mode = get_setting("Dark Mode")
