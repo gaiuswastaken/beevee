@@ -669,385 +669,385 @@ MDBoxLayout:
                                     pos_hint: {"center_y": 0.5}
                                     on_active: app.toggle_dark_mode()
 """
+def beevee():
 
+    # This defines the class NavItem outside of the KV so that Kivy Understands what it is
+    class NavItem(MDNavigationRailItem):
+        text = StringProperty() # The text underneath the icon
+        icon = StringProperty() # The icon used to depict the function of a page
+        screen_name = StringProperty() # The name of the screen to display
 
-# This defines the class NavItem outside of the KV so that Kivy Understands what it is
-class NavItem(MDNavigationRailItem):
-    text = StringProperty() # The text underneath the icon
-    icon = StringProperty() # The icon used to depict the function of a page
-    screen_name = StringProperty() # The name of the screen to display
-
-# This defines the class DBItem outside the KV so Kivy understands it
-class DBItem(MDListItem, ButtonBehavior):
-    text = StringProperty() # The text used to show the databases' name
-    
-class TaskItem(MDBoxLayout):
-    text = StringProperty()
-    topic_id = NumericProperty()
-    db_name = StringProperty()
-
-    def mark_complete(self, grade):
-        app = MDApp.get_running_app()
-        app.handle_task_completion(self, grade)
+    # This defines the class DBItem outside the KV so Kivy understands it
+    class DBItem(MDListItem, ButtonBehavior):
+        text = StringProperty() # The text used to show the databases' name
         
-class CurrencyView(MDLabel):
-    pass
+    class TaskItem(MDBoxLayout):
+        text = StringProperty()
+        topic_id = NumericProperty()
+        db_name = StringProperty()
 
-class BeeInInventoryFrame(MDBoxLayout):
-    name = StringProperty() 
-    rarity = StringProperty()
-    count = NumericProperty()
-    image = StringProperty() # The file path of the bee's image (for ease of access in the KV)
-    
-class BeeInIndexFrame(MDBoxLayout):
-    name = StringProperty() 
-    rarity = StringProperty()
-    discovered = StringProperty() # Booleans cannot be displayed nor stored in sqlite so they would have to be converted to strings
-    image = StringProperty() # The file path of the bee's image (for ease of access in the KV)
-
-class SubjectFrame(MDBoxLayout):
-    text = StringProperty() # Display name
-    db_name = StringProperty() # Actual DB filename
-    tasks = ListProperty() # The task list to be displayed
-
-    # Starts when the task_container object is created 
-    def on_kv_post(self, base_widget):
-        if not hasattr(self, 'ids') or not self.ids or not 'tasks_container' in self.ids:
-            return
-        self.ids.tasks_container.clear_widgets()
-        if self.tasks and len(self.tasks) > 0:
-            for task in self.tasks:
-                item = TaskItem(text=f"- {task['detail']}", topic_id=task['id'], db_name=self.db_name)
-                self.ids.tasks_container.add_widget(item)
-        else:
-            item = MDLabel(text="No tasks for today!!!", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
-            self.ids.tasks_container.add_widget(item)
-    
-# This defines the EggFrame
-class EggFrame(MDBoxLayout):
-    name = StringProperty()
-    cost = StringProperty()
-    image = StringProperty() # The file path of the egg's image (for ease of access in the KV)
-    
-class Beevee(MDApp):
-    daily_tasks_db_name = "daily_tasks.db"
-    honeycombs_balance = NumericProperty(0)
-    nav_bg_color = ListProperty()
-    custom_colors = DictProperty({})  # Store custom colors that update with theme
-
-    def build(self):
-        # Defines theme colours (adds a lot of lines :O )
-
-        Clock.schedule_once(self.theme_colour_on_launch) # 'ids' in KivyMD are not created until the whole GUI is created hence it needs to be scheduled
+        def mark_complete(self, grade):
+            app = MDApp.get_running_app()
+            app.handle_task_completion(self, grade)
             
-        self.apply_custom_theme()
-        # This is the only way to make the sidebar change colours on toggling it
-        self.nav_bg_color = self.theme_cls.primaryContainerColor
+    class CurrencyView(MDLabel):
+        pass
+
+    class BeeInInventoryFrame(MDBoxLayout):
+        name = StringProperty() 
+        rarity = StringProperty()
+        count = NumericProperty()
+        image = StringProperty() # The file path of the bee's image (for ease of access in the KV)
         
-        # theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
-        root = Builder.load_string(KV)
-        self.process = None # Flag for checking if DBEditor is open
-        return root
-    
-    def apply_custom_theme(self):
-        # Re-applies the custom palette. KivyMD resets these when theme_style changes.
-        theme = self.theme_cls
-        
-        # Choose scheme based on theme style. KivyMD does not automatically handle light and dark mode for custom colour schemes
-        scheme = (
-            light_colourScheme
-            if theme.theme_style == "Light"
-            else dark_colourScheme
-        )
-        
-        # Update both theme attributes and custom_colors dict
-        colors_dict = {}
-        for key, value in scheme.items():
-            # Convert hex string to RGBA tuple that KivyMD expects
-            if isinstance(value, str) and value.startswith("#"):
-                rgba_color = get_color_from_hex(value)
+    class BeeInIndexFrame(MDBoxLayout):
+        name = StringProperty() 
+        rarity = StringProperty()
+        discovered = StringProperty() # Booleans cannot be displayed nor stored in sqlite so they would have to be converted to strings
+        image = StringProperty() # The file path of the bee's image (for ease of access in the KV)
+
+    class SubjectFrame(MDBoxLayout):
+        text = StringProperty() # Display name
+        db_name = StringProperty() # Actual DB filename
+        tasks = ListProperty() # The task list to be displayed
+
+        # Starts when the task_container object is created 
+        def on_kv_post(self, base_widget):
+            if not hasattr(self, 'ids') or not self.ids or not 'tasks_container' in self.ids:
+                return
+            self.ids.tasks_container.clear_widgets()
+            if self.tasks and len(self.tasks) > 0:
+                for task in self.tasks:
+                    item = TaskItem(text=f"- {task['detail']}", topic_id=task['id'], db_name=self.db_name)
+                    self.ids.tasks_container.add_widget(item)
             else:
-                rgba_color = value
+                item = MDLabel(text="No tasks for today!!!", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
+                self.ids.tasks_container.add_widget(item)
+        
+    # This defines the EggFrame
+    class EggFrame(MDBoxLayout):
+        name = StringProperty()
+        cost = StringProperty()
+        image = StringProperty() # The file path of the egg's image (for ease of access in the KV)
+        
+    class Beevee(MDApp):
+        daily_tasks_db_name = "daily_tasks.db"
+        honeycombs_balance = NumericProperty(0)
+        nav_bg_color = ListProperty()
+        custom_colors = DictProperty({})  # Store custom colors that update with theme
+
+        def build(self):
+            # Defines theme colours (adds a lot of lines :O )
+
+            Clock.schedule_once(self.theme_colour_on_launch) # 'ids' in KivyMD are not created until the whole GUI is created hence it needs to be scheduled
                 
-            attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
-            setattr(theme, attr, rgba_color)
-            # Also store in custom_colors for KV bindings
-            colors_dict[key] = rgba_color
-        
-        # Update custom_colors property to trigger KV binding updates
-        self.custom_colors = colors_dict
-        self.nav_bg_color = self.theme_cls.primaryContainerColor
-
-    def theme_colour_on_launch(self,deltatime): # deltatime is the time between the dark mode logic being scheduled and executed
-        val_of_dark_mode = get_setting("Dark Mode")
-        print(val_of_dark_mode)
-        if val_of_dark_mode == [('False',)]:
-            self.root.ids.dark_mode_switch.active = False
-            self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
-        else:
-            self.root.ids.dark_mode_switch.active = True
-            self.theme_cls.theme_style = "Dark"
-        self.apply_custom_theme()
-
-    def toggle_dark_mode(self):
-        if self.theme_cls.theme_style == "Light":
-            enable_setting("Dark Mode")
-            self.theme_cls.theme_style = "Dark"
-        else:
-            disable_setting("Dark Mode")
-            self.theme_cls.theme_style = "Light"
-        self.apply_custom_theme()        
-
-    def openDB(self, text):
-        print(f"Opening database: {text}")
-        # Starts the editor in a separate process so the current window stays open
-        python = sys.executable # The absolute path (independent of the users drive-tree layout) of the Python interpreter running the editor
-        # Passes the name of the database (a string) as an argument
-        if self.process and self.process.poll() is None:
-            self.process.terminate() # 'Graceful Termination' - An algorithmic way of 'Press the red button to close me'
-            try:
-                self.process.wait(timeout=3) # Ensures old data is cleaned up
-            except subprocess.TimeoutExpired: # If the DBEditor is being unresponsive (a fail-safe)
-                self.process.kill() # 'Forceful Termination' - Kind of like how you kill an unresponsive app from Task Manager (or the Mac/Linux equivalents)
+            self.apply_custom_theme()
+            # This is the only way to make the sidebar change colours on toggling it
+            self.nav_bg_color = self.theme_cls.primaryContainerColor
             
-        self.process = subprocess.Popen([python, "fsrs_db_editor.py", text])
-    
-    # This function creates a new table called daily_tasks.db if it does not exist and then gets the day the task was created before invoking my spaced_repetition_planner.py to get three random tasks 
-    def setup_daily_tasks_db(self):
-        conn = sqlite3.connect(self.daily_tasks_db_name)
-        cursor = conn.cursor()
-        # Recreate table to ensure schema includes topic_id
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS daily_tasks (
-                db_name TEXT,
-                topic_id INTEGER,
-                task_detail TEXT
-            )
-        ''')
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS refresh_log (
-                last_refresh_date TEXT
-            )
-        ''')
-        # Check if refresh_log is empty and insert a dummy date if it is, it will get overidden after
-        cursor.execute("SELECT count(*) FROM refresh_log")
-        if cursor.fetchone()[0] == 0:
-            cursor.execute("INSERT INTO refresh_log (last_refresh_date) VALUES (?)", ("1970-01-01",))
-        conn.commit()
-        conn.close()
-
-    def get_daily_tasks(self):
-        self.setup_daily_tasks_db()
-        conn = sqlite3.connect(self.daily_tasks_db_name)
-        cursor = conn.cursor()
+            # theme_cls.primary_hue = "500" # Controls how light or dark this is (500 is a balance between light and dark)
+            root = Builder.load_string(KV)
+            self.process = None # Flag for checking if DBEditor is open
+            return root
         
-        cursor.execute("SELECT last_refresh_date FROM refresh_log LIMIT 1")
-        last_refresh = cursor.fetchone()[0]
-        today_str = date.today().isoformat()
-        
-        cursor.execute("SELECT count(*) FROM daily_tasks")
-        task_count = cursor.fetchone()[0]
+        def apply_custom_theme(self):
+            # Re-applies the custom palette. KivyMD resets these when theme_style changes.
+            theme = self.theme_cls
+            
+            # Choose scheme based on theme style. KivyMD does not automatically handle light and dark mode for custom colour schemes
+            scheme = (
+                light_colourScheme
+                if theme.theme_style == "Light"
+                else dark_colourScheme
+            )
+            
+            # Update both theme attributes and custom_colors dict
+            colors_dict = {}
+            for key, value in scheme.items():
+                # Convert hex string to RGBA tuple that KivyMD expects
+                if isinstance(value, str) and value.startswith("#"):
+                    rgba_color = get_color_from_hex(value)
+                else:
+                    rgba_color = value
+                    
+                attr = key + "Color"   # appends Color to each key so that I can use the Material 3 convention.
+                setattr(theme, attr, rgba_color)
+                # Also store in custom_colors for KV bindings
+                colors_dict[key] = rgba_color
+            
+            # Update custom_colors property to trigger KV binding updates
+            self.custom_colors = colors_dict
+            self.nav_bg_color = self.theme_cls.primaryContainerColor
 
-        if last_refresh != today_str or task_count == 0:
-            cursor.execute("DELETE FROM daily_tasks")
+        def theme_colour_on_launch(self,deltatime): # deltatime is the time between the dark mode logic being scheduled and executed
+            val_of_dark_mode = get_setting("Dark Mode")
+            print(val_of_dark_mode)
+            if val_of_dark_mode == [('False',)]:
+                self.root.ids.dark_mode_switch.active = False
+                self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
+            else:
+                self.root.ids.dark_mode_switch.active = True
+                self.theme_cls.theme_style = "Dark"
+            self.apply_custom_theme()
+
+        def toggle_dark_mode(self):
+            if self.theme_cls.theme_style == "Light":
+                enable_setting("Dark Mode")
+                self.theme_cls.theme_style = "Dark"
+            else:
+                disable_setting("Dark Mode")
+                self.theme_cls.theme_style = "Light"
+            self.apply_custom_theme()        
+
+        def openDB(self, text):
+            print(f"Opening database: {text}")
+            # Starts the editor in a separate process so the current window stays open
+            python = sys.executable # The absolute path (independent of the users drive-tree layout) of the Python interpreter running the editor
+            # Passes the name of the database (a string) as an argument
+            if self.process and self.process.poll() is None:
+                self.process.terminate() # 'Graceful Termination' - An algorithmic way of 'Press the red button to close me'
+                try:
+                    self.process.wait(timeout=3) # Ensures old data is cleaned up
+                except subprocess.TimeoutExpired: # If the DBEditor is being unresponsive (a fail-safe)
+                    self.process.kill() # 'Forceful Termination' - Kind of like how you kill an unresponsive app from Task Manager (or the Mac/Linux equivalents)
+                
+            self.process = subprocess.Popen([python, "fsrs_db_editor.py", text])
+        
+        # This function creates a new table called daily_tasks.db if it does not exist and then gets the day the task was created before invoking my spaced_repetition_planner.py to get three random tasks 
+        def setup_daily_tasks_db(self):
+            conn = sqlite3.connect(self.daily_tasks_db_name)
+            cursor = conn.cursor()
+            # Recreate table to ensure schema includes topic_id
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS daily_tasks (
+                    db_name TEXT,
+                    topic_id INTEGER,
+                    task_detail TEXT
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS refresh_log (
+                    last_refresh_date TEXT
+                )
+            ''')
+            # Check if refresh_log is empty and insert a dummy date if it is, it will get overidden after
+            cursor.execute("SELECT count(*) FROM refresh_log")
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("INSERT INTO refresh_log (last_refresh_date) VALUES (?)", ("1970-01-01",))
+            conn.commit()
+            conn.close()
+
+        def get_daily_tasks(self):
+            self.setup_daily_tasks_db()
+            conn = sqlite3.connect(self.daily_tasks_db_name)
+            cursor = conn.cursor()
+            
+            cursor.execute("SELECT last_refresh_date FROM refresh_log LIMIT 1")
+            last_refresh = cursor.fetchone()[0]
+            today_str = date.today().isoformat()
+            
+            cursor.execute("SELECT count(*) FROM daily_tasks")
+            task_count = cursor.fetchone()[0]
+
+            if last_refresh != today_str or task_count == 0:
+                cursor.execute("DELETE FROM daily_tasks")
+                databases = glob.glob("*.db")
+                excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db", "config.db"]
+                # Filters out the non subject related databases
+                filtered_databases = []
+                for db in databases:
+                    if db not in excluded:
+                        filtered_databases.append(db)
+                databases = filtered_databases
+
+                for db_name in databases:
+                    tasks = spaced_repetition_recommendations(db_name)
+                    # tasks is now a list of rows (TopicID, TopicDetail)
+                    for task in tasks:
+                        cursor.execute("INSERT INTO daily_tasks (db_name, topic_id, task_detail) VALUES (?, ?, ?)", (db_name, task[0], task[1]))
+                
+                cursor.execute("UPDATE refresh_log SET last_refresh_date = ?", (today_str,))
+                conn.commit()
+
+            cursor.execute("SELECT db_name, topic_id, task_detail FROM daily_tasks")
+            tasks_by_db = {}
+            for db_name, topic_id, task_detail in cursor.fetchall():
+                if db_name not in tasks_by_db:
+                    tasks_by_db[db_name] = []
+                tasks_by_db[db_name].append({'id': topic_id, 'detail': task_detail})
+            
+            conn.close()
+            return tasks_by_db
+        
+        def handle_task_completion(self, task_item, grade):
+            # Update the specific topic in the specific DB
+            try:
+                db_helper.update_grade(task_item.db_name, task_item.topic_id, grade)
+            except Exception as e:
+                print(f"Error updating grade: {e}")
+                return
+
+            conn = sqlite3.connect(self.daily_tasks_db_name)
+            cursor = conn.cursor()
+
+            # Delete the completed task from the daily_tasks database
+            cursor.execute("DELETE FROM daily_tasks WHERE topic_id = ? AND db_name = ?", (task_item.topic_id, task_item.db_name))
+            conn.commit()
+            conn.close()
+            
+            # Update currency and UI
+            update_honeycombs_after_task_completion()
+            self.update_balance()
+            
+            # Remove the widget from the list
+            if task_item.parent:
+                task_item.parent.remove_widget(task_item)
+                
+        def buy_egg(self, egg_name):
+            # Map egg names to their specific update functions from currency_manager. More secure than passing the value of the cost
+            # Using a dictionary is much more efficient than using a selection chain (the dictionary search is O(1) average case while the chain is O(n) average case)
+            mapping = {
+                "Starter": update_honeycombs_after_starter_egg_purchase,
+                "Rare": update_honeycombs_after_rare_egg_purchase,
+                "Epic": update_honeycombs_after_epic_egg_purchase,
+                "Legendary": update_honeycombs_after_legendary_egg_purchase,
+                "Mythic": update_honeycombs_after_mythic_egg_purchase
+            }
+            
+            # Map egg names to their corresponding Egg objects from egg_demo. Strings cannot be passed into open_egg (expects an object)
+            egg_object_mapping = {
+                "Starter": egg_demo.starter_egg,
+                "Rare": egg_demo.rare_egg,
+                "Epic": egg_demo.epic_egg,
+                "Legendary": egg_demo.legendary_egg,
+                "Mythic": egg_demo.mythic_egg
+            }
+                        
+            # Invokes the method for the respective egg
+            # This passes the egg name so egg_demo knows which bee to generate
+            egg_to_open = egg_object_mapping[egg_name]
+            print(egg_name)
+            hatched_bee = egg_demo.open_egg(egg_to_open) 
+            
+            
+            if egg_name in mapping: # Dictionary lookup is O(1)
+                mapping[egg_name]() # Calls the specific function
+
+            self.update_balance() # Seems self explanatory but it just updates the label that shows the balance
+            
+            self.populate_inventory() # Updates the inventory after an egg is bought
+            self.populate_index() # Updates the index after an egg is bought (slightly inefficient to do this every time an egg is opened as it may not always be the case that a bee has been discovered after opening an egg)
+            
+            # Adds a snackbar to show the user what they got from the egg. KivyMD does not let me make the snackbar in a KV string (implied according to the documentation, see here: https://kivymd.readthedocs.io/en/latest/components/snackbar/)
+            snackbar = MDSnackbar(
+                        MDSnackbarText(text=f"Opened a {egg_name} egg...",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.primaryContainerColor),
+                        MDSnackbarSupportingText(text=f"... and you hatched a {hatched_bee.name}!",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.tertiaryContainerColor),
+                        MDSnackbarButtonContainer(
+                            MDSnackbarCloseButton(
+                                icon="party-popper",
+                            ),
+                            pos_hint={"center_y": 0.5}
+                        ),
+                        background_color=self.theme_cls.onPrimaryContainerColor,
+                        
+                        y="24dp",
+                        orientation="horizontal",
+                        pos_hint={"center_x":0.5},
+                        size_hint_x=0.5,
+            )
+            snackbar.open()
+
+
+            
+            
+        def update_balance(self):
+            self.honeycombs_balance = get_honeycombs()
+            
+        def populate_inventory(self):
+            # Define the image paths for each bee 
+            image_mapping = {
+                "Basic Bee": "assets/for_code/images/basic_bee_128.png",
+                "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
+                "Stubborn Bee": "assets/for_code/images/easy_128.png",
+                "Bubble Bee": "assets/for_code/images/good_128.png",
+                "Rage Bee": "assets/for_code/images/again_128.png",
+                "Exhausted Bee": "assets/for_code/images/hard_128.png",
+                "Baby Bee": "assets/for_code/images/baby_bee_128.png",
+                "Lion Bee": "assets/for_code/images/lion_bee_128.png",
+                "Spicy Bee": "assets/for_code/images/spicy_bee_128.png"
+            }
+            # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
+            self.root.ids.inventory_list.clear_widgets()
+            bees = get_bees_from_inventory()
+            if not bees:
+                self.root.ids.inventory_list.add_widget(
+                    MDLabel(text="You have no bees in your inventory...Get some tasks done to hatch eggs!!!", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
+                )
+                return
+            
+            for name, rarity, count in bees:
+                bee_frame = BeeInInventoryFrame(name=name, rarity=rarity, count=count, image=image_mapping[name])
+                self.root.ids.inventory_list.add_widget(bee_frame)
+                
+        def populate_index(self):
+            image_mapping = {
+                "Basic Bee": "assets/for_code/images/basic_bee_128.png",
+                "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
+                "Stubborn Bee": "assets/for_code/images/easy_128.png",
+                "Bubble Bee": "assets/for_code/images/good_128.png",
+                "Rage Bee": "assets/for_code/images/again_128.png",
+                "Exhausted Bee": "assets/for_code/images/hard_128.png",
+                "Baby Bee": "assets/for_code/images/baby_bee_128.png",
+                "Lion Bee": "assets/for_code/images/lion_bee_128.png",
+                "Spicy Bee": "assets/for_code/images/spicy_bee_128.png"
+            }
+            # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
+            self.root.ids.index_list.clear_widgets()
+            bees = get_bees_from_index()
+            if not bees:
+                self.root.ids.inventory_list.add_widget(
+                    MDLabel(text="You may need to run the onboarding screen", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
+                )
+                return
+            
+            for name, rarity, discovered in bees:
+                if discovered == str(True):
+                    display_discovered = "Yes"
+                else:
+                    display_discovered = "No"
+                bee_frame = BeeInIndexFrame(name=name, rarity=rarity, discovered=display_discovered, image=image_mapping[name])
+                self.root.ids.index_list.add_widget(bee_frame)
+            
+        def on_start(self):
+            self.update_balance()
+            # Creates the database list for the editor
             databases = glob.glob("*.db")
             excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db", "config.db"]
-            # Filters out the non subject related databases
+            # Filters out the non subject related databases       
             filtered_databases = []
             for db in databases:
                 if db not in excluded:
                     filtered_databases.append(db)
             databases = filtered_databases
 
-            for db_name in databases:
-                tasks = spaced_repetition_recommendations(db_name)
-                # tasks is now a list of rows (TopicID, TopicDetail)
-                for task in tasks:
-                    cursor.execute("INSERT INTO daily_tasks (db_name, topic_id, task_detail) VALUES (?, ?, ?)", (db_name, task[0], task[1]))
+            for db in databases:
+                item = DBItem(text=db)
+                # The function on_release sends the ListItem instance as first argument, so gets the db separately
+                item.bind(on_release=lambda instance, db=db: self.openDB(db)) # 'lambda' is a way for a small function to be defined without a name. There is no main benefit apart from making my (long) code shorter
+                self.root.ids.dblist.add_widget(item)
+
+            # Creates the subject frames for the home screen
+            tasks_by_db = self.get_daily_tasks()
             
-            cursor.execute("UPDATE refresh_log SET last_refresh_date = ?", (today_str,))
-            conn.commit()
-
-        cursor.execute("SELECT db_name, topic_id, task_detail FROM daily_tasks")
-        tasks_by_db = {}
-        for db_name, topic_id, task_detail in cursor.fetchall():
-            if db_name not in tasks_by_db:
-                tasks_by_db[db_name] = []
-            tasks_by_db[db_name].append({'id': topic_id, 'detail': task_detail})
-        
-        conn.close()
-        return tasks_by_db
-    
-    def handle_task_completion(self, task_item, grade):
-        # Update the specific topic in the specific DB
-        try:
-            db_helper.update_grade(task_item.db_name, task_item.topic_id, grade)
-        except Exception as e:
-            print(f"Error updating grade: {e}")
-            return
-
-        conn = sqlite3.connect(self.daily_tasks_db_name)
-        cursor = conn.cursor()
-
-        # Delete the completed task from the daily_tasks database
-        cursor.execute("DELETE FROM daily_tasks WHERE topic_id = ? AND db_name = ?", (task_item.topic_id, task_item.db_name))
-        conn.commit()
-        conn.close()
-        
-        # Update currency and UI
-        update_honeycombs_after_task_completion()
-        self.update_balance()
-        
-        # Remove the widget from the list
-        if task_item.parent:
-            task_item.parent.remove_widget(task_item)
             
-    def buy_egg(self, egg_name):
-        # Map egg names to their specific update functions from currency_manager. More secure than passing the value of the cost
-        # Using a dictionary is much more efficient than using a selection chain (the dictionary search is O(1) average case while the chain is O(n) average case)
-        mapping = {
-            "Starter": update_honeycombs_after_starter_egg_purchase,
-            "Rare": update_honeycombs_after_rare_egg_purchase,
-            "Epic": update_honeycombs_after_epic_egg_purchase,
-            "Legendary": update_honeycombs_after_legendary_egg_purchase,
-            "Mythic": update_honeycombs_after_mythic_egg_purchase
-        }
+            for db in databases:
+                tasks = tasks_by_db.get(db, [])
+                subject_frame = SubjectFrame(text=os.path.splitext(db)[0], db_name=db, tasks=tasks)
+                self.root.ids.home_list.add_widget(subject_frame)
+                
+            # Populates the inventory when the app starts
+            self.populate_inventory()
+            # Populates index when app starts
+            self.populate_index()
         
-        # Map egg names to their corresponding Egg objects from egg_demo. Strings cannot be passed into open_egg (expects an object)
-        egg_object_mapping = {
-            "Starter": egg_demo.starter_egg,
-            "Rare": egg_demo.rare_egg,
-            "Epic": egg_demo.epic_egg,
-            "Legendary": egg_demo.legendary_egg,
-            "Mythic": egg_demo.mythic_egg
-        }
-                    
-        # Invokes the method for the respective egg
-        # This passes the egg name so egg_demo knows which bee to generate
-        egg_to_open = egg_object_mapping[egg_name]
-        print(egg_name)
-        hatched_bee = egg_demo.open_egg(egg_to_open) 
-        
-        
-        if egg_name in mapping: # Dictionary lookup is O(1)
-            mapping[egg_name]() # Calls the specific function
 
-        self.update_balance() # Seems self explanatory but it just updates the label that shows the balance
-        
-        self.populate_inventory() # Updates the inventory after an egg is bought
-        self.populate_index() # Updates the index after an egg is bought (slightly inefficient to do this every time an egg is opened as it may not always be the case that a bee has been discovered after opening an egg)
-        
-        # Adds a snackbar to show the user what they got from the egg. KivyMD does not let me make the snackbar in a KV string (implied according to the documentation, see here: https://kivymd.readthedocs.io/en/latest/components/snackbar/)
-        snackbar = MDSnackbar(
-                    MDSnackbarText(text=f"Opened a {egg_name} egg...",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.primaryContainerColor),
-                    MDSnackbarSupportingText(text=f"... and you hatched a {hatched_bee.name}!",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.tertiaryContainerColor),
-                    MDSnackbarButtonContainer(
-                        MDSnackbarCloseButton(
-                            icon="party-popper",
-                        ),
-                        pos_hint={"center_y": 0.5}
-                    ),
-                    background_color=self.theme_cls.onPrimaryContainerColor,
-                    
-                    y="24dp",
-                    orientation="horizontal",
-                    pos_hint={"center_x":0.5},
-                    size_hint_x=0.5,
-        )
-        snackbar.open()
-
-
-        
-        
-    def update_balance(self):
-        self.honeycombs_balance = get_honeycombs()
-        
-    def populate_inventory(self):
-        # Define the image paths for each bee 
-        image_mapping = {
-            "Basic Bee": "assets/for_code/images/basic_bee_128.png",
-            "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
-            "Stubborn Bee": "assets/for_code/images/easy_128.png",
-            "Bubble Bee": "assets/for_code/images/good_128.png",
-            "Rage Bee": "assets/for_code/images/again_128.png",
-            "Exhausted Bee": "assets/for_code/images/hard_128.png",
-            "Baby Bee": "assets/for_code/images/baby_bee_128.png",
-            "Lion Bee": "assets/for_code/images/lion_bee_128.png",
-            "Spicy Bee": "assets/for_code/images/spicy_bee_128.png"
-        }
-        # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
-        self.root.ids.inventory_list.clear_widgets()
-        bees = get_bees_from_inventory()
-        if not bees:
-            self.root.ids.inventory_list.add_widget(
-                MDLabel(text="You have no bees in your inventory...Get some tasks done to hatch eggs!!!", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
-            )
-            return
-        
-        for name, rarity, count in bees:
-            bee_frame = BeeInInventoryFrame(name=name, rarity=rarity, count=count, image=image_mapping[name])
-            self.root.ids.inventory_list.add_widget(bee_frame)
-            
-    def populate_index(self):
-        image_mapping = {
-            "Basic Bee": "assets/for_code/images/basic_bee_128.png",
-            "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
-            "Stubborn Bee": "assets/for_code/images/easy_128.png",
-            "Bubble Bee": "assets/for_code/images/good_128.png",
-            "Rage Bee": "assets/for_code/images/again_128.png",
-            "Exhausted Bee": "assets/for_code/images/hard_128.png",
-            "Baby Bee": "assets/for_code/images/baby_bee_128.png",
-            "Lion Bee": "assets/for_code/images/lion_bee_128.png",
-            "Spicy Bee": "assets/for_code/images/spicy_bee_128.png"
-        }
-        # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
-        self.root.ids.index_list.clear_widgets()
-        bees = get_bees_from_index()
-        if not bees:
-            self.root.ids.inventory_list.add_widget(
-                MDLabel(text="You may need to run the onboarding screen", halign="center", theme_font_name="Custom", font_name="robotvar.ttf")
-            )
-            return
-        
-        for name, rarity, discovered in bees:
-            if discovered == str(True):
-                display_discovered = "Yes"
-            else:
-                display_discovered = "No"
-            bee_frame = BeeInIndexFrame(name=name, rarity=rarity, discovered=display_discovered, image=image_mapping[name])
-            self.root.ids.index_list.add_widget(bee_frame)
-        
-    def on_start(self):
-        self.update_balance()
-        # Creates the database list for the editor
-        databases = glob.glob("*.db")
-        excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db", "config.db"]
-        # Filters out the non subject related databases       
-        filtered_databases = []
-        for db in databases:
-            if db not in excluded:
-                filtered_databases.append(db)
-        databases = filtered_databases
-
-        for db in databases:
-            item = DBItem(text=db)
-            # The function on_release sends the ListItem instance as first argument, so gets the db separately
-            item.bind(on_release=lambda instance, db=db: self.openDB(db)) # 'lambda' is a way for a small function to be defined without a name. There is no main benefit apart from making my (long) code shorter
-            self.root.ids.dblist.add_widget(item)
-
-        # Creates the subject frames for the home screen
-        tasks_by_db = self.get_daily_tasks()
-        
-        
-        for db in databases:
-            tasks = tasks_by_db.get(db, [])
-            subject_frame = SubjectFrame(text=os.path.splitext(db)[0], db_name=db, tasks=tasks)
-            self.root.ids.home_list.add_widget(subject_frame)
-            
-        # Populates the inventory when the app starts
-        self.populate_inventory()
-        # Populates index when app starts
-        self.populate_index()
-    
-
-Beevee().run()
+    Beevee().run()

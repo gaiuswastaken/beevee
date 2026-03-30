@@ -7,9 +7,32 @@ Config.set("graphics", "width", "1280")
 Config.set("graphics", "height", "720")
 Config.set("graphics", "resizable", "0")
 
+# Check if this is the first run before loading everything else
+def is_first_run():
+    try:
+        from config_manager import get_setting
+        result = get_setting("Onboarding Complete")
+        if not result:  # Setting doesn't exist (most likely because config.db hasn't been created yet by the onboarding screen)
+            return True
+        enabled = result[0][0]  # Get the first tuple's first value
+        # If enabled is the string 'True', onboarding is complete, so not first run
+        return enabled != 'True'
+    except Exception as e:
+        print(f"Error checking first run status: {e}")
+        # If config.db doesn't exist or there's an error, assume first run
+        return True
+
+# If not first run, launch main app and exit
+if __name__ == "__main__" and not is_first_run():
+    print("Onboarding already complete - launching main app...")
+    from main_screen import beevee
+    beevee()
+    exit()
+
 # Libraries
 from kivy.lang import Builder # Builds the KV statement
 from kivy.utils import get_color_from_hex # Convert hex colors to RGBA
+from kivy.properties import NumericProperty, ListProperty, DictProperty # For properties
 from kivymd.app import MDApp # How to actually run the code
 from kivy.clock import Clock # Allows for functions to be scheduled (useful for stuff that involves networking, in this case Gemini)
 from threading import Thread # Allows for the use of threading (separate code executions, useful for running multiple things at once).
@@ -23,6 +46,7 @@ from currency_manager import create_honeycomb_currency_db
 from inventory_manager import create_inventory
 from index_manager import create_index, build_index
 from config_manager import create_setting, enable_setting
+from multiprocessing import Process
 
 
 KV = """
@@ -204,6 +228,9 @@ MDScreen:
 
 class OnboardingScreen(MDApp):
     key = "" # This way the API Key can be accessed throughout the application
+    honeycombs_balance = NumericProperty(0)  # For KV file compatibility
+    nav_bg_color = ListProperty()  # For KV file compatibility
+    custom_colors = DictProperty({})  # For KV file compatibility
     def build(self):
         # Make spinner and buttons render properly
         self.theme_cls.theme_style = "Light" # Kind of self explanatory as this just determines the theme (light vs dark mode)
@@ -348,6 +375,9 @@ class OnboardingScreen(MDApp):
         print("SPEC:", subject, "=>", result)
         self.root.ids.subject_input.text = ""
         self.root.ids.url_input.text = ""
+        # Clear any previous error messages on success
+        self.root.ids.subject_errors.text = ""
+        self.root.ids.url_input.error = False
 
         if self.subject_index < 4:
             self.subject_index += 1
@@ -365,10 +395,20 @@ class OnboardingScreen(MDApp):
             self.root.ids.onboarding.index = 4
         except Exception:
             pass
+    
+    def launch_beevee(self):
+        from main_screen import Beevee # The main screen (where the user will spend most of their time after onboarding)
+        # I have to import it here otherwise the Main Screen would show up first
+        Beevee().run()
 
     def finish_onboarding(self):
         print("Onboarding complete!")
         enable_setting("Onboarding Complete")
         # I should call it so that the main app gets launched (not yet in development)
+        process = Process(target=self.launch_beevee)
+        process.start()
+        Clock.schedule_once(lambda dt: os._exit(0), 10)  # Stops the onboarding screen so that the main screen can be shown (otherwise they would run at the same time and confuse the user)
 
-OnboardingScreen().run()
+if __name__ == "__main__": # Necessary to prevent the code from being run when imported
+    print("First run detected - launching onboarding...")
+    OnboardingScreen().run()
