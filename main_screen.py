@@ -32,6 +32,7 @@ import glob # For searching the databases
 from fsrs_db_editor import editor_main # My database editor
 import subprocess # How I can open my editor in a separate window
 import sys # Used to get the absolute path of the Python interpreter
+from pathlib import Path # Used to get the absolute path of the editor script. Fixes an error where the editor opens and closes without warning in current setup
 
 # Libraries for the shop screen
 from kivymd.uix.snackbar import * # For the pop-up messages when an egg is bought
@@ -52,6 +53,7 @@ KV = """
 
 # Forces NavItem to inherit MDNavigationRailItem
 <NavItem>:
+    ripple_func_in: "out_quint"
     
     on_active:
         if args[1]: app.root.ids.screen_manager.current = root.screen_name
@@ -60,9 +62,6 @@ KV = """
         icon: root.icon
         pos_hint: {"center_x": 0.5,"y": 1}  # Moves the icon up
 
-    # MDNavigationRailItemLabel:
-    #     text: root.text
-    #     #pos_hint: {"y": -1}  # Moves the label up
     
 # Creates a new class called DBItem where I can alter the text and what will happen if I click on it
 <DBItem>:
@@ -380,6 +379,8 @@ MDBoxLayout:
     MDScreenManager:
         id: screen_manager
         current: ""
+        duration: 0.15
+        switch_animation: "in_out_back"
         md_bg_color: app.theme_cls.backgroundColor # This way, dark mode is also supported
         
         # The blank screen that shows up first (when the main program is launched)
@@ -803,14 +804,16 @@ def beevee():
             # Starts the editor in a separate process so the current window stays open
             python = sys.executable # The absolute path (independent of the users drive-tree layout) of the Python interpreter running the editor
             # Passes the name of the database (a string) as an argument
+            editor_path = Path(__file__).parent / "fsrs_db_editor.py" # Ensures that the editor is always found
             if self.process and self.process.poll() is None:
                 self.process.terminate() # 'Graceful Termination' - An algorithmic way of 'Press the red button to close me'
                 try:
                     self.process.wait(timeout=3) # Ensures old data is cleaned up
                 except subprocess.TimeoutExpired: # If the DBEditor is being unresponsive (a fail-safe)
                     self.process.kill() # 'Forceful Termination' - Kind of like how you kill an unresponsive app from Task Manager (or the Mac/Linux equivalents)
-                
-            self.process = subprocess.Popen([python, "fsrs_db_editor.py", text])
+            
+            # Ensures that the absolute path of the editor is always used (fixes the error where the editor opens and closes without warning in current setup)
+            self.process = subprocess.Popen([python, str(editor_path), text],cwd=editor_path.parent)
         
         # This function creates a new table called daily_tasks.db if it does not exist and then gets the day the task was created before invoking my spaced_repetition_planner.py to get three random tasks 
         def setup_daily_tasks_db(self):
@@ -953,6 +956,11 @@ def beevee():
                         orientation="horizontal",
                         pos_hint={"center_x":0.5},
                         size_hint_x=0.5,
+                        show_transition="in_out_back",
+                        hide_transition="in_out_quart",
+                        show_duration=0.35,
+                        duration=2,
+                        hide_duration=0.2
             )
             snackbar.open()
 
@@ -965,15 +973,15 @@ def beevee():
         def populate_inventory(self):
             # Define the image paths for each bee 
             image_mapping = {
-                "Basic Bee": "assets/for_code/images/basic_bee_128.png",
+                "Noob Bee": "assets/for_code/images/noob_bee_128.png",
                 "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
-                "Stubborn Bee": "assets/for_code/images/easy_128.png",
-                "Bubble Bee": "assets/for_code/images/good_128.png",
-                "Rage Bee": "assets/for_code/images/again_128.png",
-                "Exhausted Bee": "assets/for_code/images/hard_128.png",
-                "Baby Bee": "assets/for_code/images/baby_bee_128.png",
+                "Overconfident Bee": "assets/for_code/images/easy_128.png",
+                "Happy Bee": "assets/for_code/images/good_128.png",
+                "Frustrated Bee": "assets/for_code/images/again_128.png",
+                "Sleep-Deprived Bee": "assets/for_code/images/hard_128.png",
+                "Chibi Bee": "assets/for_code/images/chibi_bee_128.png",
                 "Lion Bee": "assets/for_code/images/lion_bee_128.png",
-                "Spicy Bee": "assets/for_code/images/spicy_bee_128.png"
+                "Flame Bee": "assets/for_code/images/flame_bee_128.png"
             }
             # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
             self.root.ids.inventory_list.clear_widgets()
@@ -990,15 +998,15 @@ def beevee():
                 
         def populate_index(self):
             image_mapping = {
-                "Basic Bee": "assets/for_code/images/basic_bee_128.png",
+                "Noob Bee": "assets/for_code/images/noob_bee_128.png",
                 "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
-                "Stubborn Bee": "assets/for_code/images/easy_128.png",
-                "Bubble Bee": "assets/for_code/images/good_128.png",
-                "Rage Bee": "assets/for_code/images/again_128.png",
-                "Exhausted Bee": "assets/for_code/images/hard_128.png",
-                "Baby Bee": "assets/for_code/images/baby_bee_128.png",
+                "Overconfident Bee": "assets/for_code/images/easy_128.png",
+                "Happy Bee": "assets/for_code/images/good_128.png",
+                "Frustrated Bee": "assets/for_code/images/again_128.png",
+                "Sleep-Deprived Bee": "assets/for_code/images/hard_128.png",
+                "Chibi Bee": "assets/for_code/images/chibi_bee_128.png",
                 "Lion Bee": "assets/for_code/images/lion_bee_128.png",
-                "Spicy Bee": "assets/for_code/images/spicy_bee_128.png"
+                "Flame Bee": "assets/for_code/images/flame_bee_128.png"
             }
             # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
             self.root.ids.index_list.clear_widgets()

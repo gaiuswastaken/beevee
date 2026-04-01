@@ -11,6 +11,7 @@ Config.set("graphics", "resizable", "0")
 from kivy.lang import Builder # This applies the formatting defined on KV
 from kivy.properties import NumericProperty, StringProperty # Kivy has an easier way to set th datatypes of properties than stock python
 from kivy.properties import ListProperty # Same with lists. 
+import sys # This is necessary to fix a bug that prevents the editor from launching with the current setup
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.graphics import Color, Rectangle
@@ -27,6 +28,9 @@ from pathlib import Path
 from colour_palette import * # My colour palette for the GUI
 from config_manager import get_setting
 from kivy.clock import Clock
+import os
+
+os.chdir(Path(__file__).parent)
 
 KV = """
 MDScreen:
@@ -212,7 +216,8 @@ MDScreen:
                     halign: "center"
                     theme_font_name: "Custom"
                     font_name: "robotvar.ttf"
-
+                    
+# Template classes are necessary when generating multiple widgets with near identical formatting but different data (in this case, the rows of the database), just knew what it was after making the onboarding screen
 <TopicRow>:
     md_bg_color: app.theme_cls.surfaceVariantColor if self.is_alternate else app.theme_cls.surfaceColor
     pos: self.pos
@@ -467,6 +472,8 @@ def editor_main(database:str):
                     spacing="8dp",
                 ),
                 size_hint=(0.9, None),
+                show_transition="out_back",
+                hide_transition="out_quart"
             )
             self.dialog = dlg
             dlg.open()
@@ -517,6 +524,8 @@ def editor_main(database:str):
                     spacing="8dp",
                 ),
                 size_hint=(0.9, None),
+                show_transition="out_back",
+                hide_transition="out_quart"
             )
             self.dialog = dlg
             dlg.open()    
@@ -534,3 +543,20 @@ def editor_main(database:str):
         
     # Launches the editor when editor_main is invoked
     DBEditorApp().run()
+    
+if __name__ == "__main__":
+    import traceback
+    try:
+        if len(sys.argv) > 1:
+            database = sys.argv[1]
+        else:
+            print("No database provided")
+            input("Press Enter to exit...")
+            sys.exit()
+
+        editor_main(database)
+
+    except Exception as e:
+        print("CRASHED:")
+        traceback.print_exc()
+        input("Press Enter to exit...")

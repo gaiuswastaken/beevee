@@ -2,6 +2,7 @@
 from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
+
 # Forces 720p, scaling issues are a nightmare to fix
 Config.set("graphics", "width", "1280")
 Config.set("graphics", "height", "720")
@@ -55,13 +56,14 @@ MDScreen:
         id: onboarding
         loop: False # If true, it will go on and on (which is not ideal)
         scroll_timeout: 0
+        
 
         # Welcome Screen
         MDBoxLayout:
             orientation: "vertical"
             spacing: "24dp"
             padding: "32dp"
-            md_bg_color: self.theme_cls.backgroundColor # ALlows for dark mode in the future
+            md_bg_color: self.theme_cls.backgroundColor # Allows for dark mode in the future
 
             MDLabel:
                 text: "Welcome to Beevee!!!"

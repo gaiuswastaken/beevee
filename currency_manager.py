@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import date
 
 def create_honeycomb_currency_db():
     conn = sqlite3.connect("currency.db")

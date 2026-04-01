@@ -109,12 +109,3 @@ def sub_list_gen(website: str, name: str, api_key_param:str):
             except sqlite3.Error as er:
                 errors.append(f"SQLite Error {er.sqlite_errorcode}: {er.sqlite_errorname}, please try again") 
     return errors
-
-# Stores the errors, if there are none, it just proceeds as usual
-# errors = sub_list_gen("https://qualifications.pearson.com/content/dam/pdf/A%20Level/Mathematics/2017/specification-and-sample-assesment/a-level-l3-further-mathematics-specification.pdf","further_maths_for_me")
-
-# This is just for the purpose of debugging, it will be removed in the final code
-""" if len(errors) > 0:
-    counter = 0
-    for counter in range (0, len(errors)):
-"""

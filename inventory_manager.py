@@ -6,15 +6,15 @@ from index_manager import discover_bee
 # Hardcoding the dictionary may not be the best solution but it makes accessing it faster 
 # (in the future, may make it a JSON file that way, it is easier to edit but this future solution runs the risk of unwarranted edititng)
 bees = {
-    "Basic Bee": {"rarity": "Common"},
+    "Noob Bee": {"rarity": "Common"},
     "Bumble Bee": {"rarity": "Rare"},
-    "Stubborn Bee": {"rarity": "Rare"},
-    "Bubble Bee": {"rarity": "Epic"},
-    "Rage Bee": {"rarity": "Epic"},
-    "Exhausted Bee": {"rarity": "Epic"},
-    "Baby Bee": {"rarity": "Legendary"},
+    "Overconfident Bee": {"rarity": "Rare"},
+    "Happy Bee": {"rarity": "Epic"},
+    "Frustrated Bee": {"rarity": "Epic"},
+    "Sleep-Deprived Bee": {"rarity": "Epic"},
+    "Chibi Bee": {"rarity": "Legendary"},
     "Lion Bee": {"rarity": "Legendary"},
-    "Spicy Bee": {"rarity": "Mythic"}
+    "Flame Bee": {"rarity": "Mythic"}
 }
 
 # Creates the bees inventory

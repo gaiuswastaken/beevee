@@ -14,5 +14,25 @@ Mainly A Level Students doing 3-4 A Levels
 - A Google Gemini API Key (if you do not know how to get it or what it is, learn more about it [here](GEMINI_KEY.md)
 - Internet links for your specifications (must start with https:// and be a PDF!)
 
-# How to set it up
-Download the zip file for this then run main.py (alter after completion of program)
+# How to download it (amend later as I am exploring compilation)
+1. Click on the green button that says 'Code'
+2. Then click on 'Download ZIP'
+3. Download the ZIP
+4. Extract the ZIP
+5. Move the folder to your preferred location
+
+# Setting up Python with the necessary libraries
+Downloading Python is necessary otherwise it will simply not run
+
+## Python
+1. Go to the Python website [here](https://www.python.org/)
+2. Then click on 'Downloads'
+3. Then scroll to 'Looking for a specific release?'
+4. Scroll on the table to find 'Python 3.12.10' (recommended)
+5. Download the version that is suitable for you (Windows: Get the Windows Installer, Mac: Get the macOS version, Linux: Do not download from here, use your package manager)
+6. Install Python (duh)
+7. At the end of the installation screen, do not modify the default preferences
+
+## Libraries
+T
+
