@@ -14,7 +14,7 @@ Mainly A Level Students doing 3-4 A Levels
 - A Google Gemini API Key (if you do not know how to get it or what it is, learn more about it [here](GEMINI_KEY.md)
 - Internet links for your specifications (must start with https:// and be a PDF!)
 
-# How to download it (amend later as I am exploring compilation)
+# How to download it
 1. Click on the green button that says 'Code'
 2. Then click on 'Download ZIP'
 3. Download the ZIP
@@ -28,11 +28,16 @@ Downloading Python is necessary otherwise it will simply not run
 1. Go to the Python website [here](https://www.python.org/)
 2. Then click on 'Downloads'
 3. Then scroll to 'Looking for a specific release?'
-4. Scroll on the table to find 'Python 3.12.10' (recommended)
+4. Scroll on the table to find 'Python 3.12.10' (recommended) but you are free to use the latest Python 3.12 or even Python 3.13  
 5. Download the version that is suitable for you (Windows: Get the Windows Installer, Mac: Get the macOS version, Linux: Do not download from here, use your package manager)
 6. Install Python (duh)
 7. At the end of the installation screen, do not modify the default preferences
 
 ## Libraries
-T
+To downoad the libraries, double click on 'install_dependencies.py' to run it (it should install the necessary libraries)
+
+# How to use it
+1. Go to the location where you placed Beevee (e.g. Desktop, Downloads, etc.)
+2. To run it, double click on 'main_program.py'
+
 

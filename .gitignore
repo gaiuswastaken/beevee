@@ -36,3 +36,5 @@ tempCodeRunnerFile.python
 text_fields_test.kv
 db_editor_main.py
 db_editor.kv
+error_output.txt
+fsrs_db_editor.kv
