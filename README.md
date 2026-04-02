@@ -38,6 +38,6 @@ To downoad the libraries, double click on 'install_dependencies.py' to run it (i
 
 # How to use it
 1. Go to the location where you placed Beevee (e.g. Desktop, Downloads, etc.)
-2. To run it, double click on 'main_program.py'
+2. To run it, double click on 'main_program.py' (may have to run it twice)
 
 
