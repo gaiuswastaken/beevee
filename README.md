@@ -68,9 +68,10 @@ This is why the downloading was initially more complicated (if you followed the 
 2. To run it, double click on 'main_program_macos.command' (may have to run it twice)
 
 # Extra information
+- On the onboarding screen, when it asks for your 4th subject, if you don't do a 4th subject, input `none` in the subject name field and type some gibberish in the specification URL
+
 - When you finish the setup, go to the editor (indicated by the pen and paper) and then select your subject and add your confidence ratings (the task recommendation algorithm will not work without it)
 - Close the editor
 - Repeat for every subject you are doing
 - Then close the main app and reopen it
-
 
