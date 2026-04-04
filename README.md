@@ -25,6 +25,7 @@ Mainly A Level Students doing 3-4 A Levels
 
 ## macOS/Linux
 To be frank, setting up Beevee on macOS and Linux is more complicated on Windows (because they are fundamentally different)
+
 However, I have tried to simplify it as much as possible despite the limitations I have (this is the simplest, least error-prone way)
 
 1. (macOS) Open the 'Terminal' app (sounds scary but is not)
@@ -69,6 +70,8 @@ This is why the downloading was initially more complicated (if you followed the 
 
 # Extra information
 - On the onboarding screen, when it asks for your 4th subject, if you don't do a 4th subject, input `none` in the subject name field and type some gibberish in the specification URL
+
+
 
 - When you finish the setup, go to the editor (indicated by the pen and paper) and then select your subject and add your confidence ratings (the task recommendation algorithm will not work without it)
 - Close the editor
