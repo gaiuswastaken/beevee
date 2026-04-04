@@ -1,5 +1,6 @@
 # Libraries
 import sqlite3
+import os
 
 # Dictionary Mappings 
 # Hardcoding the dictionary may not be the best solution but it makes accessing it faster 
@@ -16,9 +17,12 @@ bees = {
     "Flame Bee": {"rarity": "Mythic"}
 }
 
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
+
 # Creates the bees inventory
 def create_index():
-    conn = sqlite3.connect("index.db")
+    DB_PATH = os.path.join(ABS_PATH, "index.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     # Also conducts a sanity check to see if there isnt a table called index (this prevents unnecessary overwriting of data, which could lead to data loss)
     cursor.execute('''
@@ -34,7 +38,8 @@ def create_index():
 
 # Allows for the index to be built when the onboarding screen is launched
 def build_index():
-    conn = sqlite3.connect("index.db")
+    DB_PATH = os.path.join(ABS_PATH, "index.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     for bee in range(len(bees)):
         bee = list(bees.keys())[bee]
@@ -46,7 +51,8 @@ def build_index():
 
 # Updates the value of the bees to be discovered to True
 def discover_bee(bee):
-    conn = sqlite3.connect("index.db")
+    DB_PATH = os.path.join(ABS_PATH, "index.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("UPDATE beeIndex SET discovered = ? WHERE beeName = ?", (str(True), bee))
     conn.commit()
@@ -54,7 +60,8 @@ def discover_bee(bee):
 
 # Returns the list of bees - useful for the Index page in the main screen as I will separate them from discovered and undiscovered
 def get_bees_from_index():
-    conn = sqlite3.connect("index.db")
+    DB_PATH = os.path.join(ABS_PATH, "index.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT beeName, beeRarity, discovered FROM beeIndex")
     available_bees = cursor.fetchall()

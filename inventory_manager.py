@@ -1,6 +1,9 @@
 # Libraries
 import sqlite3
 from index_manager import discover_bee
+import os
+
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # Dictionary Mappings 
 # Hardcoding the dictionary may not be the best solution but it makes accessing it faster 
@@ -19,7 +22,8 @@ bees = {
 
 # Creates the bees inventory
 def create_inventory():
-    conn = sqlite3.connect("inventory.db")
+    DB_PATH = os.path.join(ABS_PATH, "inventory.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     # Also conducts a sanity check to see if there isnt a table called inventory (this prevents unnecessary overwriting of data, which could lead to data loss)
     cursor.execute('''
@@ -35,7 +39,8 @@ def create_inventory():
 
 # Allows for any bee to be added
 def add_bee_to_inventory(bee):
-    conn = sqlite3.connect("inventory.db")
+    DB_PATH = os.path.join(ABS_PATH, "inventory.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     # Checks if the bee is already present
     object_bee_in_db_search = cursor.execute('''SELECT count FROM inventory WHERE beeName = (?)''', (bee.name,))
@@ -56,7 +61,8 @@ def add_bee_to_inventory(bee):
     
 # Returns the list of bees in inventory - useful for the Inventory page in the main screen as I will dynamically populate it
 def get_bees_from_inventory():
-    conn = sqlite3.connect("inventory.db")
+    DB_PATH = os.path.join(ABS_PATH, "inventory.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT beeName, beeRarity, count FROM inventory")
     available_bees = cursor.fetchall()

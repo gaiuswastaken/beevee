@@ -1,7 +1,11 @@
 import sqlite3
+import os
+
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 def create_setting(setting):
-    conn = sqlite3.connect("config.db")
+    DB_PATH = os.path.join(ABS_PATH, "config.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     # Also conducts a sanity check to see if there isnt a table called settings (this prevents unnecessary overwriting of data, which could lead to data loss)
     cursor.execute('''
@@ -17,7 +21,8 @@ def create_setting(setting):
     conn.close()
     
 def get_setting(setting):
-    conn = sqlite3.connect("config.db")
+    DB_PATH = os.path.join(ABS_PATH, "config.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT enabled FROM settings WHERE name = ?", (setting,))
     value_setting = cursor.fetchall()
@@ -25,14 +30,16 @@ def get_setting(setting):
     return value_setting
 
 def enable_setting(setting):
-    conn = sqlite3.connect("config.db")
+    DB_PATH = os.path.join(ABS_PATH, "config.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("UPDATE settings SET enabled = ? WHERE name = ?", (str(True), setting))
     conn.commit()
     conn.close()
     
 def disable_setting(setting):
-    conn = sqlite3.connect("config.db")
+    DB_PATH = os.path.join(ABS_PATH, "config.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("UPDATE settings SET enabled = ? WHERE name = ?", (str(False), setting))
     conn.commit()

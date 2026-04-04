@@ -1,7 +1,11 @@
 import sqlite3
+import os
+
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 def create_honeycomb_currency_db():
-    conn = sqlite3.connect("currency.db")
+    DB_PATH = os.path.join(ABS_PATH, "currency.db") 
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''
             CREATE TABLE IF NOT EXISTS currency (
@@ -16,7 +20,8 @@ def create_honeycomb_currency_db():
     conn.close()
     
 def get_honeycombs():
-    conn = sqlite3.connect("currency.db")
+    DB_PATH = os.path.join(ABS_PATH, "currency.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT honeycombs FROM currency LIMIT 1")
     honeycombs = cursor.fetchone()[0]
@@ -24,42 +29,48 @@ def get_honeycombs():
     return honeycombs
 
 def update_honeycombs_after_task_completion(amount=20):
-    conn = sqlite3.connect("currency.db")
+    DB_PATH = os.path.join(ABS_PATH, "currency.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs + ?", (amount,))
     conn.commit()
     conn.close()
 
 def update_honeycombs_after_starter_egg_purchase(amount=200):
-    conn = sqlite3.connect("currency.db")
+    DB_PATH = os.path.join(ABS_PATH, "currency.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()
     conn.close()
 
 def update_honeycombs_after_rare_egg_purchase(amount=400):
-    conn = sqlite3.connect("currency.db")
-    cursor = conn.cursor()  
+    DB_PATH = os.path.join(ABS_PATH, "currency.db")
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()
     conn.close()
     
 def update_honeycombs_after_epic_egg_purchase(amount=800):
-    conn = sqlite3.connect("currency.db")
+    DB_PATH = os.path.join(ABS_PATH, "currency.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()
     conn.close()
 
 def update_honeycombs_after_legendary_egg_purchase(amount=1600):
-    conn = sqlite3.connect("currency.db")
+    DB_PATH = os.path.join(ABS_PATH, "currency.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()
     conn.close()
 
 def update_honeycombs_after_mythic_egg_purchase(amount=3200):
-    conn = sqlite3.connect("currency.db")
+    DB_PATH = os.path.join(ABS_PATH, "currency.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
     conn.commit()

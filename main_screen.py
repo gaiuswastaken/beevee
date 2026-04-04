@@ -46,6 +46,7 @@ from datetime import date # Checks the age of the task
 import db_helper # Helper for updating grades
 from spaced_repetition_planner import spaced_repetition_recommendations # My module for the spaced repetition planner
 
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 KV = """
 # Template class for the Rail item so that I dont have to repeat stuff multiple times
@@ -731,7 +732,7 @@ def beevee():
         image = StringProperty() # The file path of the egg's image (for ease of access in the KV)
         
     class Beevee(MDApp):
-        daily_tasks_db_name = "daily_tasks.db"
+        daily_tasks_db_name = os.path.join(ABS_PATH, "daily_tasks.db") # The file path of the daily tasks database (absolute)
         honeycombs_balance = NumericProperty(0)
         nav_bg_color = ListProperty()
         custom_colors = DictProperty({})  # Store custom colors that update with theme
@@ -853,8 +854,13 @@ def beevee():
 
             if last_refresh != today_str or task_count == 0:
                 cursor.execute("DELETE FROM daily_tasks")
-                databases = glob.glob("*.db")
-                excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db", "config.db"]
+                databases = glob.glob(os.path.join(ABS_PATH, "*.db"))
+                excluded = [
+                    self.daily_tasks_db_name, 
+                    os.path.join(ABS_PATH, "currency.db"), 
+                    os.path.join(ABS_PATH, "index.db"), 
+                    os.path.join(ABS_PATH, "inventory.db"), 
+                    os.path.join(ABS_PATH, "config.db")]
                 # Filters out the non subject related databases
                 filtered_databases = []
                 for db in databases:
@@ -973,15 +979,15 @@ def beevee():
         def populate_inventory(self):
             # Define the image paths for each bee 
             image_mapping = {
-                "Noob Bee": "assets/for_code/images/noob_bee_128.png",
-                "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
-                "Overconfident Bee": "assets/for_code/images/easy_128.png",
-                "Happy Bee": "assets/for_code/images/good_128.png",
-                "Frustrated Bee": "assets/for_code/images/again_128.png",
-                "Sleep-Deprived Bee": "assets/for_code/images/hard_128.png",
-                "Chibi Bee": "assets/for_code/images/chibi_bee_128.png",
-                "Lion Bee": "assets/for_code/images/lion_bee_128.png",
-                "Flame Bee": "assets/for_code/images/flame_bee_128.png"
+                "Noob Bee": os.path.join(ABS_PATH, "assets/for_code/images/noob_bee_128.png"),
+                "Bumble Bee": os.path.join(ABS_PATH, "assets/for_code/images/bumble_bee_128.png"),
+                "Overconfident Bee": os.path.join(ABS_PATH, "assets/for_code/images/easy_128.png"),
+                "Happy Bee": os.path.join(ABS_PATH, "assets/for_code/images/good_128.png"),
+                "Frustrated Bee": os.path.join(ABS_PATH, "assets/for_code/images/again_128.png"),
+                "Sleep-Deprived Bee": os.path.join(ABS_PATH, "assets/for_code/images/hard_128.png"),
+                "Chibi Bee": os.path.join(ABS_PATH, "assets/for_code/images/chibi_bee_128.png"),
+                "Lion Bee": os.path.join(ABS_PATH, "assets/for_code/images/lion_bee_128.png"),
+                "Flame Bee": os.path.join(ABS_PATH, "assets/for_code/images/flame_bee_128.png")
             }
             # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
             self.root.ids.inventory_list.clear_widgets()
@@ -998,15 +1004,15 @@ def beevee():
                 
         def populate_index(self):
             image_mapping = {
-                "Noob Bee": "assets/for_code/images/noob_bee_128.png",
-                "Bumble Bee": "assets/for_code/images/bumble_bee_128.png",
-                "Overconfident Bee": "assets/for_code/images/easy_128.png",
-                "Happy Bee": "assets/for_code/images/good_128.png",
-                "Frustrated Bee": "assets/for_code/images/again_128.png",
-                "Sleep-Deprived Bee": "assets/for_code/images/hard_128.png",
-                "Chibi Bee": "assets/for_code/images/chibi_bee_128.png",
-                "Lion Bee": "assets/for_code/images/lion_bee_128.png",
-                "Flame Bee": "assets/for_code/images/flame_bee_128.png"
+                "Noob Bee": os.path.join(ABS_PATH, "assets/for_code/images/noob_bee_128.png"),
+                "Bumble Bee": os.path.join(ABS_PATH, "assets/for_code/images/bumble_bee_128.png"),
+                "Overconfident Bee": os.path.join(ABS_PATH, "assets/for_code/images/easy_128.png"),
+                "Happy Bee": os.path.join(ABS_PATH, "assets/for_code/images/good_128.png"),
+                "Frustrated Bee": os.path.join(ABS_PATH, "assets/for_code/images/again_128.png"),
+                "Sleep-Deprived Bee": os.path.join(ABS_PATH, "assets/for_code/images/hard_128.png"),
+                "Chibi Bee": os.path.join(ABS_PATH, "assets/for_code/images/chibi_bee_128.png"),
+                "Lion Bee": os.path.join(ABS_PATH, "assets/for_code/images/lion_bee_128.png"),
+                "Flame Bee": os.path.join(ABS_PATH, "assets/for_code/images/flame_bee_128.png")
             }
             # Clear old widgets before repopulating (ensures no old remnants remain from the previous session)
             self.root.ids.index_list.clear_widgets()
@@ -1028,8 +1034,12 @@ def beevee():
         def on_start(self):
             self.update_balance()
             # Creates the database list for the editor
-            databases = glob.glob("*.db")
-            excluded = [self.daily_tasks_db_name, "currency.db", "index.db", "inventory.db", "config.db"]
+            databases = glob.glob(os.path.join(ABS_PATH, "*.db"))
+            excluded = [self.daily_tasks_db_name, 
+                        os.path.join(ABS_PATH, "currency.db"), 
+                        os.path.join(ABS_PATH, "index.db"), 
+                        os.path.join(ABS_PATH, "inventory.db"), 
+                        os.path.join(ABS_PATH, "config.db")]
             # Filters out the non subject related databases       
             filtered_databases = []
             for db in databases:

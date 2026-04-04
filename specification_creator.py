@@ -10,6 +10,7 @@ import requests
 
 # I want to make this a callable module so that I can run it from a GUI without the 'scary black box', aka a terminal appearing
 def sub_list_gen(website: str, name: str, api_key_param:str):
+    ABS_PATH = os.path.dirname(os.path.abspath(__file__))
     # Validation
     INVALID_CHARS = set(r'\/:*?"<>|') | {'\0'}
     errors = [] # List to hold all the errors to be output
@@ -72,8 +73,8 @@ def sub_list_gen(website: str, name: str, api_key_param:str):
         client = genai.Client(api_key=API_KEY)
 
         # Prepares the url part by putting URL string in prompt
-        sql_file = name+".sql"
-        db_file = name+".db"
+        sql_file = os.path.join(ABS_PATH, name + ".sql")
+        db_file = os.path.join(ABS_PATH, name + ".db")
 
         # Stores a copy of the contents of website in case anything goes wrong
         web_part = website
