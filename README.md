@@ -46,8 +46,8 @@ Downloading Python is necessary otherwise it will simply not run
 3. Then scroll to 'Looking for a specific release?'
 4. Scroll on the table to find 'Python 3.12.10' (recommended) but you are free to use the latest Python 3.12 (do not go beyond that though)
 5. Download the version that is suitable for you (Windows: Get the Windows Installer, Mac: Get the macOS version, Linux: Do not download from here, use your package manager)
-6. Install Python (duh)
-7. At the end of the installation screen, do not modify the default preferences
+6. Make sure to enable the PATH checkbox before installing
+7. Install Python (duh)
 
 ## Libraries
 
