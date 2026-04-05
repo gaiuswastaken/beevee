@@ -17,7 +17,22 @@ Mainly A Level Students doing 3-4 A Levels
 
 # How to download it
 
-## Windows
+## Windows: Method 1 (my favourite way as updates are a dream here)
+1. Download Git [here](https://git-scm.com/)
+2. Install Git
+3. Run Git Bash
+4. Now type `git clone https://github.com/gaiuswastaken/beevee`
+5. Now type `explorer .`
+6. Find the folder 'beevee'
+7. Move the folder 'beevee' to a convenient location. This could be your Desktop, Downloads or a folder specifically created for it 
+
+### Updating
+1. Copy the path your beevee directory is in (at the top of the ribbon)
+2. Open Git Bash 
+3. Run `cd "{your directory}"`
+4. Then type `git pull`
+
+## Windows: Method 2 (requires redownloading in case it needs updates)
 1. Click on the green button that says 'Code'
 2. Then click on 'Download ZIP'
 3. Download the ZIP
@@ -37,6 +52,12 @@ However, I have tried to simplify it as much as possible despite the limitations
 4. Now type `git clone https://github.com/gaiuswastaken/beevee`
 5. Now type `open .` (macOS) or `xdg-open .` (Linux). This should make it so that it opens the current directory in your file manager
 6. Move the folder 'beevee' to a convenient location. This could be your Desktop, Downloads or a folder specifically created for it 
+
+### Updating
+1. Copy the path your beevee directory is in (at the top of the ribbon)
+2. Open Git Bash 
+3. Run `cd "{your directory}"`
+4. Then type `git pull`
 
 # Setting up Python with the necessary libraries
 Downloading Python is necessary otherwise it will simply not run
