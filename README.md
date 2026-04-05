@@ -11,6 +11,7 @@ Mainly A Level Students doing 3-4 A Levels
 - Tracks how many bees you have discovered!
 
 # Prerequisites
+- The attention span to read the instructions (failure to read them leads to issues that can be avoided otherwise)
 - A Google Gemini API Key (if you do not know how to get it or what it is, learn more about it [here](GEMINI_KEY.md)
 - Internet links for your specifications (must start with https:// and be a PDF!)
 
