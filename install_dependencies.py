@@ -6,7 +6,7 @@ import importlib # Checks the libraries have been installed
 dependencies = {
     "kivy": "kivy==2.3.1",
     "requests": "requests",
-    "google_genai": "google-generativeai"
+    "google.genai": "google-genai"
 }
     
 def check_and_install_dependencies_not_kivymd():
