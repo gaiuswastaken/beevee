@@ -40,38 +40,58 @@ def update_honeycombs_after_starter_egg_purchase(amount=200):
     DB_PATH = os.path.join(ABS_PATH, "currency.db")
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
-    conn.commit()
+    honeycombs = get_honeycombs()    
+    if honeycombs < amount:
+        print("Not enough honeycombs to purchase the Starter Egg")
+    else:
+        cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
+        conn.commit()
     conn.close()
 
 def update_honeycombs_after_rare_egg_purchase(amount=400):
     DB_PATH = os.path.join(ABS_PATH, "currency.db")
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
-    conn.commit()
+    honeycombs = get_honeycombs()
+    if honeycombs < amount:
+        print("Not enough honeycombs to purchase the Rare Egg")
+    else:
+        cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
+        conn.commit()
     conn.close()
     
 def update_honeycombs_after_epic_egg_purchase(amount=800):
     DB_PATH = os.path.join(ABS_PATH, "currency.db")
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
-    conn.commit()
+    honeycombs = get_honeycombs()
+    if honeycombs < amount:
+        print("Not enough honeycombs to purchase the Epic Egg")
+    else:
+        cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
+        conn.commit()
     conn.close()
 
 def update_honeycombs_after_legendary_egg_purchase(amount=1600):
     DB_PATH = os.path.join(ABS_PATH, "currency.db")
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
-    conn.commit()
+    honeycombs = get_honeycombs()
+    if honeycombs < amount:
+        print("Not enough honeycombs to purchase the Legendary Egg")
+    else:
+        cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
+        conn.commit()
     conn.close()
 
 def update_honeycombs_after_mythic_egg_purchase(amount=3200):
     DB_PATH = os.path.join(ABS_PATH, "currency.db")
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
-    conn.commit()
+    honeycombs = get_honeycombs()
+    if honeycombs < amount:
+        print("Not enough honeycombs to purchase the Mythic Egg")
+    else:
+        cursor.execute("UPDATE currency SET honeycombs = honeycombs - ?", (amount,))
+        conn.commit()
     conn.close()
