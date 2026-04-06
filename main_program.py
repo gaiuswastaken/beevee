@@ -47,7 +47,8 @@ from currency_manager import create_honeycomb_currency_db
 from inventory_manager import create_inventory
 from index_manager import create_index, build_index
 from config_manager import create_setting, enable_setting
-from multiprocessing import Process
+import subprocess # For launching the main app after onboarding
+import sys # For getting the current Python interpreter path to launch the main screen after onboarding
 
 
 KV = """
@@ -406,10 +407,10 @@ class OnboardingScreen(MDApp):
     def finish_onboarding(self):
         print("Onboarding complete!")
         enable_setting("Onboarding Complete")
-        # I should call it so that the main app gets launched (not yet in development)
-        process = Process(target=self.launch_beevee)
+        # I should call it so that the main app gets launched
+        process = subprocess.Popen([sys.executable, "main_program.py"])
         process.start()
-        Clock.schedule_once(lambda dt: os._exit(0), 10)  # Stops the onboarding screen so that the main screen can be shown (otherwise they would run at the same time and confuse the user)
+        Clock.schedule_once(lambda dt: self.stop(), 5)  # Stops the onboarding screen so that the main screen can be shown (otherwise they would run at the same time and confuse the user)
 
 if __name__ == "__main__": # Necessary to prevent the code from being run when imported
     print("First run detected - launching onboarding...")
