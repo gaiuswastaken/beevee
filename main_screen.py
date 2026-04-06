@@ -912,6 +912,7 @@ def beevee():
                 task_item.parent.remove_widget(task_item)
                 
         def buy_egg(self, egg_name):
+            self.honeycombs_balance = get_honeycombs() # Gets the most up to date balance before buying an egg
             # Map egg names to their specific update functions from currency_manager. More secure than passing the value of the cost
             # Using a dictionary is much more efficient than using a selection chain (the dictionary search is O(1) average case while the chain is O(n) average case)
             mapping = {
@@ -934,20 +935,12 @@ def beevee():
             # Invokes the method for the respective egg
             # This passes the egg name so egg_demo knows which bee to generate
             egg_to_open = egg_object_mapping[egg_name]
-            print(egg_name)
-            hatched_bee = egg_demo.open_egg(egg_to_open) 
-            
-            
-            if egg_name in mapping: # Dictionary lookup is O(1)
-                mapping[egg_name]() # Calls the specific function
-
-            self.update_balance() # Seems self explanatory but it just updates the label that shows the balance
-            
-            self.populate_inventory() # Updates the inventory after an egg is bought
-            self.populate_index() # Updates the index after an egg is bought (slightly inefficient to do this every time an egg is opened as it may not always be the case that a bee has been discovered after opening an egg)
-            
-            # Adds a snackbar to show the user what they got from the egg. KivyMD does not let me make the snackbar in a KV string (implied according to the documentation, see here: https://kivymd.readthedocs.io/en/latest/components/snackbar/)
-            snackbar = MDSnackbar(
+            amount_to_deduct = mapping[egg_name].__defaults__[0] # A hacky way to get the cost of the egg without much rejigging (may be unstable tho)
+            if self.honeycombs_balance >= amount_to_deduct:
+                print(egg_name)
+                hatched_bee = egg_demo.open_egg(egg_to_open) 
+                # Adds a snackbar to show the user what they got from the egg. KivyMD does not let me make the snackbar in a KV string (implied according to the documentation, see here: https://kivymd.readthedocs.io/en/latest/components/snackbar/)
+                snackbar = MDSnackbar(
                         MDSnackbarText(text=f"Opened a {egg_name} egg...",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.primaryContainerColor),
                         MDSnackbarSupportingText(text=f"... and you hatched a {hatched_bee.name}!",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.tertiaryContainerColor),
                         MDSnackbarButtonContainer(
@@ -967,12 +960,27 @@ def beevee():
                         show_duration=0.35,
                         duration=2,
                         hide_duration=0.2
-            )
-            snackbar.open()
-
-
-            
-            
+                )
+                snackbar.open()
+                self.update_balance() # Seems self explanatory but it just updates the label that shows the balance
+                self.populate_inventory() # Updates the inventory after an egg is bought
+                self.populate_index() # Updates the index after an egg is bought (slightly inefficient to do this every time an egg is opened as it may not always be the case that a bee has been discovered after opening an egg)
+                
+            else:
+                not_enough_snackbar = MDSnackbar(
+                                MDSnackbarText(text=f"Not enough honeycombs to buy {egg_name} egg!",theme_font_name="Custom", font_name="robotvar.ttf", theme_text_color="Custom", text_color=self.theme_cls.primaryContainerColor),
+                                background_color=self.theme_cls.onPrimaryContainerColor,
+                                y="24dp",
+                                pos_hint={"center_x":0.5},
+                                size_hint_x=0.5,
+                                show_transition="in_out_back",
+                                hide_transition="in_out_quart",
+                                show_duration=0.35,
+                                duration=2,
+                                hide_duration=0.2
+                )
+                not_enough_snackbar.open()
+                    
         def update_balance(self):
             self.honeycombs_balance = get_honeycombs()
             

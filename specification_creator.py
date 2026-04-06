@@ -33,9 +33,13 @@ def sub_list_gen(website: str, name: str, api_key_param:str):
                 )
                 break
         
-        # Windows Specific - checks if name starts or ends with space or dot
-        if name and (name[0]in {' ','.'} or name [-1] in {' ', '.'}):
-            errors.append("Name cannot start or end with a space or dot")
+        # Windows Specific - checks if name starts or ends with dot
+        if name and (name[0]in {'.'} or name [-1] in {'.'}):
+            errors.append("Name cannot start or end with a dot")
+            
+        # Windows Specific - checks if name has whitespaces in the middle (I am allowing whitespaces at the start and end as they will be stripped and it is not uncommon for users to accidentally add a whitespace at the end of a filename, however I do not want to allow whitespaces in the middle as it can cause issues with Gemini when I feed the filename into the prompt)
+        if any(character.isspace() for character in name[1:-1]):
+            errors.append("Name cannot contain whitespace (spaces, tabs) in the middle")
 
         if not website.startswith("https://") or not website.lower().endswith(".pdf"):
             errors.append("Website must start with 'https://' and end with '.pdf'")

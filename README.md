@@ -19,7 +19,7 @@ Mainly A Level Students doing 3-4 A Levels
 
 ## Windows: Method 1 (my favourite way as updates are a dream here)
 1. Download Git [here](https://git-scm.com/)
-2. Install Git
+2. Install Git (keep defaults except for text editor, change this to either notepad or notepad++)
 3. Run Git Bash
 4. Now type `git clone https://github.com/gaiuswastaken/beevee`
 5. Now type `explorer .`

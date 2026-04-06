@@ -399,9 +399,9 @@ class OnboardingScreen(MDApp):
             pass
     
     def launch_beevee(self):
-        from main_screen import Beevee # The main screen (where the user will spend most of their time after onboarding)
+        from main_screen import beevee # The main screen (where the user will spend most of their time after onboarding)
         # I have to import it here otherwise the Main Screen would show up first
-        Beevee().run()
+        beevee()
 
     def finish_onboarding(self):
         print("Onboarding complete!")
