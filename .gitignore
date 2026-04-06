@@ -38,3 +38,5 @@ db_editor_main.py
 db_editor.kv
 error_output.txt
 fsrs_db_editor.kv
+main_test.py
+onboarding_test.py
