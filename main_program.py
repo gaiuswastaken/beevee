@@ -258,6 +258,7 @@ class OnboardingScreen(MDApp):
         build_index()
         create_setting("Dark Mode")
         create_setting("Onboarding Complete")
+        self.finish_onboarding() # For testing purposes, this will be removed later. It just skips the onboarding process and goes straight to the main screen (which is useful for testing the main screen without having to go through onboarding every time I run the program)
         # Track which subject we're on (1..4)
         self.subject_index = 1
         self._update_subject_title()
