@@ -408,7 +408,7 @@ class OnboardingScreen(MDApp):
         print("Onboarding complete!")
         enable_setting("Onboarding Complete")
         # I should call it so that the main app gets launched
-        process = subprocess.Popen([sys.executable, "main_screen.py"])
+        subprocess.Popen([sys.executable, "main_screen.py"])
         Clock.schedule_once(lambda dt: self.stop(), 5)  # Stops the onboarding screen so that the main screen can be shown (otherwise they would run at the same time and confuse the user)
 
 if __name__ == "__main__": # Necessary to prevent the code from being run when imported
