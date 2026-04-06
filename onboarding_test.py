@@ -34,7 +34,7 @@ class OnboardingApp(MDApp):
         subprocess.Popen([sys.executable, __file__, "main"])
 
         # Close onboarding after 5 seconds
-        Clock.schedule_once(lambda dt: self.stop(), .000005)
+        Clock.schedule_once(lambda dt: self.stop(), )
 
 
 # ---------------- LAUNCH LOGIC ----------------

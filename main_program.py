@@ -23,13 +23,6 @@ def is_first_run():
         # If config.db doesn't exist or there's an error, assume first run
         return True
 
-# If not first run, launch main app and exit
-if __name__ == "__main__" and not is_first_run():
-    print("Onboarding already complete - launching main app...")
-    from main_screen import beevee
-    beevee()
-    exit()
-
 # Libraries
 from kivy.lang import Builder # Builds the KV statement
 from kivy.utils import get_color_from_hex # Convert hex colors to RGBA
@@ -413,5 +406,17 @@ class OnboardingScreen(MDApp):
         Clock.schedule_once(lambda dt: self.stop(), 0)  # Stops the onboarding screen so that the main screen can be shown (otherwise they would run at the same time and confuse the user)
 
 if __name__ == "__main__": # Necessary to prevent the code from being run when imported
-    print("First run detected - launching onboarding...")
-    OnboardingScreen().run()
+    # If not first run, launch main app and exit
+    main_screen = os.path.join(os.path.dirname(os.path.abspath(__file__)), "main_screen.py")
+    from main_screen import beevee # The main screen (where the user will spend most of their time after onboarding)
+    if len(sys.argv) > 1 and sys.argv[1] == "main":
+        print("Running Main Screen")
+        beevee()
+
+    else:
+        if is_first_run():
+            print("First run hence running onboarding")
+            OnboardingScreen().run()
+        else:
+            print("Not first run hence running main screen")
+            beevee()
