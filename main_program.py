@@ -410,7 +410,7 @@ class OnboardingScreen(MDApp):
         # I should call it so that the main app gets launched
         main_screen = os.path.join(os.path.dirname(os.path.abspath(__file__)), "main_screen.py")
         subprocess.Popen([sys.executable, main_screen])
-        Clock.schedule_once(lambda dt: self.stop(), 5)  # Stops the onboarding screen so that the main screen can be shown (otherwise they would run at the same time and confuse the user)
+        Clock.schedule_once(lambda dt: self.stop(), 0)  # Stops the onboarding screen so that the main screen can be shown (otherwise they would run at the same time and confuse the user)
 
 if __name__ == "__main__": # Necessary to prevent the code from being run when imported
     print("First run detected - launching onboarding...")
