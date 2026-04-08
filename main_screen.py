@@ -864,12 +864,13 @@ def beevee():
                 # Filters out the non subject related databases
                 filtered_databases = []
                 for db in databases:
-                    if db not in excluded:
+                    if os.path.normcase(db) not in [os.path.normcase(ex) for ex in excluded]:
                         filtered_databases.append(db)
                 databases = filtered_databases
 
-                for db_name in databases:
-                    tasks = spaced_repetition_recommendations(db_name)
+                for db_path in databases:
+                    db_name = os.path.normcase(db_path)
+                    tasks = spaced_repetition_recommendations(db_path)
                     # tasks is now a list of rows (TopicID, TopicDetail)
                     for task in tasks:
                         cursor.execute("INSERT INTO daily_tasks (db_name, topic_id, task_detail) VALUES (?, ?, ?)", (db_name, task[0], task[1]))
@@ -880,6 +881,8 @@ def beevee():
             cursor.execute("SELECT db_name, topic_id, task_detail FROM daily_tasks")
             tasks_by_db = {}
             for db_name, topic_id, task_detail in cursor.fetchall():
+                print(f"Task - DB: {db_name}, Topic ID: {topic_id}, Detail: {task_detail}")
+                db_name = os.path.normcase(db_name)
                 if db_name not in tasks_by_db:
                     tasks_by_db[db_name] = []
                 tasks_by_db[db_name].append({'id': topic_id, 'detail': task_detail})
@@ -1066,8 +1069,8 @@ def beevee():
             
             
             for db in databases:
-                tasks = tasks_by_db.get(db, [])
-                subject_frame = SubjectFrame(text=os.path.splitext(db)[0], db_name=db, tasks=tasks)
+                tasks = tasks_by_db.get(os.path.normcase(db), [])
+                subject_frame = SubjectFrame(text=os.path.splitext(os.path.basename(os.path.normcase(db)))[0], db_name=os.path.normcase(db), tasks=tasks)
                 self.root.ids.home_list.add_widget(subject_frame)
                 
             # Populates the inventory when the app starts

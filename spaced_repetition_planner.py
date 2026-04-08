@@ -17,7 +17,6 @@ def spaced_repetition_recommendations(table:str):
         cursor = conn.execute("SELECT TopicID, TopicDetail FROM Topics WHERE DateToReview <= ?",(date_review,))
         rows = cursor.fetchall()
         chosen_topics = []
-        all_subject_topics_editable = rows
         chosen_topics = random.sample(rows, k=min(3, len(rows)))
         conn.close()
         return chosen_topics
